@@ -1,0 +1,3 @@
+
+main_bot = "6607246878:AAHs55yPV7run5MUN7QNuYahjxto9IUToAM"
+yare_test_bot = "7004301340:AAFYNXNivo3kHNDbU1XnXRHYJpa5kpU-RgQ"
