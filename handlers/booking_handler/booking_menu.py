@@ -6,8 +6,8 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-import bots
-import keyboards
+import bots, keyboards
+import db_booking
 
 router = Router()
 
@@ -42,7 +42,8 @@ async def chooselocation(callback: types.CallbackQuery):
 async def bookstanytsia(callback: types.CallbackQuery):
     await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік", reply_markup=keyboards.stanytsiakb)
 
-@router.callback_query(F.data == "RegistrateBookinStanytsia")
+
+@router.callback_query(F.data == "RegistrateBookingStanytsia")
 async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Bookingreg.booking_name)
     await bot.send_message(chat_id=callback.from_user.id, text="Введіть назву події")
@@ -89,23 +90,36 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
     end_datetime = f'{data["day"]}T{data["end_time"]}:00Z'
 
     if await check_event_conflicts(start_datetime, end_datetime):
-        await message.answer("There is already an event at this time. Please choose a different time.")
+        await message.answer("Це приміщення зайняте в цей час. Оберіть інший час.")
         await state.clear()
     else:
         response = await add_calendar_event(data)
         if 'event' in response:
+            db = db_booking.Booking_DataBase("db_plast.db")
+            db.add_book_reg(
+                user_id=message.from_user.id,
+                user_name=message.from_user.first_name, 
+                user_surname=message.from_user.last_name,  
+                user_domivka=data["number_of_room"],  #змінити state
+                user_room=data["number_of_room"],      
+                user_date=data["day"],
+                user_start_time=data["start_time"],
+                user_end_time=data["end_time"],
+                code_of_booking=response['event'].get('id', 'no_code') 
+            )
+            await db_booking.Booking_DataBase.add_book_reg( message.from_user.user_id, message.from_user.username, message.from_user.user_surname,  )
             await message.answer("Ваше бронювання заповнено")
         else:
             await message.answer("Сталася помилка при додаванні події. Спробуйте ще раз.")
         await state.clear()
 
-    # Debugging print statements
+    # Debugging prints
     print(data["booking_name"])
     print(data["number_of_room"])
     print(data["start_time"])
     print(data["end_time"])
 
-# Your existing functions
+
 async def fetch_calendar_events(start_dt, end_dt):
     url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
     params = {
