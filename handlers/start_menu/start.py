@@ -11,7 +11,7 @@ from handlers.start_menu import start_keyboard as kb
 import keyboards
 
 router = Router()
-db = DataBase("lviv_plast_bot.db")
+db = DataBase("db_plast.db")
 
 class registrate_user(StatesGroup):
     user_name = State()
