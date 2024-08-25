@@ -60,6 +60,18 @@ vynnykykb = InlineKeyboardMarkup(
         ]
     ]
 )
+vynnyky_rooms = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="кімната 1"),
+            KeyboardButton(text="кімната 2")
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True,
+    input_field_placeholder="Обери кімнату",
+    selective=True
+)
 
 khotkevychakb = InlineKeyboardMarkup(
     inline_keyboard=[
