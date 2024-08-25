@@ -83,9 +83,9 @@ async def reg_email(message: Message, state: FSMContext):
     await state.clear()
 
 
-@router.message()
-async def trash(message: Message):
-    await message.answer("Не розумію тебе")
+# @router.message()
+# async def trash(message: Message):
+#     await message.answer("Не розумію тебе")
 
 
 @router.message(Command("menu"))
