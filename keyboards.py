@@ -52,6 +52,23 @@ stanytsiakb = InlineKeyboardMarkup(
     ]
 )
 
+room_inline = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="201", callback_data="201"),
+            InlineKeyboardButton(text="203", callback_data="203"),
+        ],
+        [
+            InlineKeyboardButton(text="206", callback_data="206"),
+            InlineKeyboardButton(text="207", callback_data="207"),
+        ],
+        [
+            InlineKeyboardButton(text="204", callback_data="204"),
+            InlineKeyboardButton(text="303", callback_data="303"),
+        ],
+    ]
+)
+
 vynnykykb = InlineKeyboardMarkup(
     inline_keyboard=[
         [

@@ -1,22 +1,21 @@
-
 import asyncio
-from datetime import datetime, timedelta
-import pytz
-from pydantic import BaseModel
 import requests
+import re
 from aiogram import Bot, Dispatcher, F, types, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from aiogram.client.bot import DefaultBotProperties
-import bots, keyboards
-from . import db_booking
-import calendars
+import bots
+import keyboards
+from datetime import datetime
+import pytz
+from calendars import TEAMUP_API_KEY, TEAMUP_CALENDAR_ID
+import db_booking
 
 router = Router()
 
-bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode="HTML"))
+bot = Bot(bots.main_bot)
 
 
 class Bookingreg(StatesGroup):
@@ -46,7 +45,6 @@ async def chooselocation(callback: types.CallbackQuery):
 async def bookstanytsia(callback: types.CallbackQuery):
     await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік", reply_markup=keyboards.stanytsiakb)
 
-
 @router.callback_query(F.data == "RegistrateBookingStanytsia")
 async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Bookingreg.booking_name)
@@ -56,62 +54,64 @@ async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
 async def reg_stanytsia_two(message: Message, state: FSMContext):
     await state.update_data(booking_name=message.text)
     await state.set_state(Bookingreg.number_of_room)
-    await message.answer("Введіть номер кімнати")
+    await message.answer("Оберіть номер кімнати", reply_markup=keyboards.room_inline)
 
-@router.message(Bookingreg.number_of_room)
-async def reg_stanytsia_three(message: Message, state: FSMContext):
-    await state.update_data(number_of_room=message.text)
+@router.callback_query(Bookingreg.number_of_room)
+async def reg_stanytsia_three(callback: CallbackQuery, state: FSMContext):
+    await state.update_data(number_of_room=callback.data)
     await state.set_state(Bookingreg.day)
-    await message.answer("Введіть день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
+    await callback.message.answer("Введіть день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
 
 @router.message(Bookingreg.day)
 async def reg_stanytsia_four(message: Message, state: FSMContext):
+    date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+    if not re.match(date_pattern, message.text):
+        await message.answer("Неправильний формат дати. Будь ласка, введіть день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
+        return
     await state.update_data(day=message.text)
     await state.set_state(Bookingreg.start_time)
     await message.answer("Введіть час початку у форматі ГГ:ХХ. Наприклад 15:00")
 
 @router.message(Bookingreg.start_time)
 async def reg_stanytsia_five(message: Message, state: FSMContext):
+    time_pattern = r"^\d{2}:\d{2}$"
+    if not re.match(time_pattern, message.text):
+        await message.answer("Неправильний формат часу. Будь ласка, введіть час у форматі ГГ:ХХ. Наприклад 15:00")
+        return
     await state.update_data(start_time=message.text)
     await state.set_state(Bookingreg.end_time)
     await message.answer("Введіть час закінчення у форматі ГГ:ХХ. Наприклад 16:00")
 
-from datetime import datetime, timedelta
-import pytz
-
-# Приклад конвертації місцевого часу в UTC
-def local_to_utc(local_dt_str, tz_str):
-    local_tz = pytz.timezone(tz_str)
-    local_dt = datetime.strptime(local_dt_str, '%Y-%m-%dT%H:%M:%S')
-    local_dt = local_tz.localize(local_dt)
-    utc_dt = local_dt.astimezone(pytz.UTC)
-    return utc_dt.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
 
 @router.message(Bookingreg.end_time)
 async def reg_stanytsia_six(message: Message, state: FSMContext):
+    time_pattern = r"^\d{2}:\d{2}$"
+    if not re.match(time_pattern, message.text):
+        await message.answer("Неправильний формат часу. Будь ласка, введіть час у форматі ГГ:ХХ. Наприклад 16:00")
+        return
     await state.update_data(end_time=message.text)
     data = await state.get_data()
-
-    if data["number_of_room"] == "303":
-        stanytsia_subid = 13281316
-    elif data["number_of_room"] == "203":
-        stanytsia_subid = 13281315
+    
+    room_mapping = {"303": 13281316, "203": 13281315}
+    if data["number_of_room"] in room_mapping:
+        data["number_of_room"] = room_mapping[data["number_of_room"]]
     else:
         await message.answer("Ви ввели неправильний номер кімнати. Зареєструйте бронювання ще раз.")
         await state.set_state(Bookingreg.booking_name)
         await bot.send_message(chat_id=message.from_user.id, text="Введіть назву події")
         return
 
-    # Конвертація часу з місцевого в UTC
-    tz_str = 'Europe/Kiev'
-    start_datetime = local_to_utc(f'{data["day"]}T{data["start_time"]}:00', tz_str)
-    end_datetime = local_to_utc(f'{data["day"]}T{data["end_time"]}:00', tz_str)
+    local_tz = pytz.timezone("Europe/Kiev")
+    start_datetime = local_tz.localize(datetime.strptime(f'{data["day"]} {data["start_time"]}', '%Y-%m-%d %H:%M')).astimezone(pytz.utc)
+    end_datetime = local_tz.localize(datetime.strptime(f'{data["day"]} {data["end_time"]}', '%Y-%m-%d %H:%M')).astimezone(pytz.utc)
 
-    if await check_event_conflicts(start_datetime, end_datetime, calendars.TEAMUP_API_KEY):
-        await message.answer("Це приміщення зайняте в цей час. Оберіть інший час.")
-        await state.clear()
+    print(f"Checking conflicts for room {data['number_of_room']} from {start_datetime.isoformat()} to {end_datetime.isoformat()}")
+    if await check_event_conflicts(data["number_of_room"], start_datetime.isoformat(), end_datetime.isoformat()):
+        await message.answer("На цей час у вибраній кімнаті вже є подія. Виберіть інший час.")
+        await state.set_state(Bookingreg.day)  # повернення до дати
+        await message.answer("Введіть день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
     else:
-        response = await add_calendar_event(data, calendars.TEAMUP_API_KEY, calendars.TEAMUP_CALENDAR_ID, stanytsia_subid)
+        response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat())
         if 'event' in response:
             db = db_booking.Booking_DataBase("db_plast.db")
             db.add_book_reg(
@@ -127,73 +127,67 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
             )
             await message.answer("Ваше бронювання заповнено")
         else:
-            await message.answer("Сталася помилка при додаванні події. Спробуйте ще раз.")
+            await message.answer("Сталася помилка при додаванні події. Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
         await state.clear()
 
-    # Debugging prints
+    # Debugging print statements
     print(data["booking_name"])
     print(data["number_of_room"])
     print(data["start_time"])
     print(data["end_time"])
 
-async def add_calendar_event(data, apikey, calendar_id, subid):
-    url = f"https://api.teamup.com/{calendar_id}/events"
-    headers = {"Teamup-Token": apikey, "Content-Type": "application/json"}
-    event_data = {
-        "subcalendar_ids": [subid],
-        "title": data["booking_name"],
-        "start_dt": f'{data["day"]}T{data["start_time"]}:00Z',
-        "end_dt": f'{data["day"]}T{data["end_time"]}:00Z',
-    }
-    print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
-    response = requests.post(url, headers=headers, json=event_data)
-    print("Add event response:", response.status_code, response.text)
-    return response.json()
 
-
-async def fetch_calendar_events(start_dt, end_dt, apikey):
-    apikey = "3483fc717a58e4453a2742b1d98c34e6eba12eed3a8ec74f3997842e3366702a"  # Перевірте правильність API-ключа
-    url = f"https://api.teamup.com/ksmr4o4huehb9n9sph/events"
-    
-    # Дебаг-прінти для перевірки вхідних даних
-    print("Fetching calendar events:")
-    print(f"API Key: {apikey}")
-    print(f"Start Date: {start_dt}")
-    print(f"End Date: {end_dt}")
-    
+async def fetch_calendar_events(subcalendar_id, start_dt, end_dt):
+    url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
     params = {
         "startDate": start_dt,
-        "endDate": end_dt
+        "endDate": end_dt,
+        "subcalendarId[]": [subcalendar_id]  # Make sure this is an array
     }
-    
-    headers = {"Teamup-Token": apikey}
-    
-    try:
-        # Відправляємо запит до API
-        response = requests.get(url, headers=headers, params=params)
-        
-        # Дебаг-прінти для перевірки відповіді
-        print("Response Status Code:", response.status_code)
-        print("Response Text:", response.text)
-        
-        if response.status_code == 200:
-            events = response.json().get("events", [])
-            print("Fetched Events:", events)  # Дебаг-прінт для перевірки подій
-            return events
-        else:
-            print("Failed to fetch events:", response.status_code, response.text)
-            return []
-    
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    headers = {"Teamup-Token": TEAMUP_API_KEY}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        events = response.json().get("events", [])
+        print(f"Fetched events: {events}")
+        return events
+    else:
+        print("Failed to fetch events:", response.status_code, response.text)
         return []
 
 
-async def check_event_conflicts(new_start, new_end, apikey_):
-    existing_events = await fetch_calendar_events(new_start, new_end, apikey_)
+async def check_event_conflicts(subcalendar_id, new_start, new_end):
+    print(f"Fetching existing events for room {subcalendar_id} from {new_start} to {new_end}")
+    
+    existing_events = await fetch_calendar_events(subcalendar_id, new_start, new_end)
+    
+    # Convert new_start and new_end to datetime objects
+    new_start_dt = datetime.fromisoformat(new_start)
+    new_end_dt = datetime.fromisoformat(new_end)
+    
     for event in existing_events:
-        event_start = event['start_dt']
-        event_end = event['end_dt']
-        if (event_start < new_end) and (event_end > new_start):
+        event_start = datetime.fromisoformat(event['start_dt'])
+        event_end = datetime.fromisoformat(event['end_dt'])
+        
+        print(f"Checking event {event['id']} from {event_start} to {event_end}")
+        if (event_start < new_end_dt) and (event_end > new_start_dt):
+            print("Conflict found!")
             return True  # Conflict found
+    
+    print("No conflict found.")
     return False  # No conflict
+
+
+
+async def add_calendar_event(data, start_dt, end_dt):
+    url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
+    headers = {"Teamup-Token": TEAMUP_API_KEY, "Content-Type": "application/json"}
+    event_data = {
+        "subcalendar_ids": [data["number_of_room"]],
+        "title": data["booking_name"],
+        "start_dt": start_dt,
+        "end_dt": end_dt,
+    }
+    print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
+    response = requests.post(url, headers=headers, json=event_data)
+    print("Add event response:", response.status_code, response.text)  # Debugging print to verify response
+    return response.json()

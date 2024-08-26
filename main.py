@@ -1,6 +1,6 @@
 import asyncio
 from aiogram import Bot, Dispatcher
-from handlers.booking_handler import booking_menu, vynnyky
+from handlers.booking_handler import booking_menu
 from handlers.start_menu import start
 import bots
 
@@ -11,7 +11,7 @@ async def main():
     dp.include_routers(
         booking_menu.router,
         start.router,
-        vynnyky.router
+        #vynnyky.router
     )
 
     await bot.delete_webhook(drop_pending_updates=True)
