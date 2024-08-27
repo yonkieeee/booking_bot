@@ -33,11 +33,11 @@ bookingk = InlineKeyboardMarkup(
     [
         [InlineKeyboardButton(text="Шептицьких, 16", callback_data="stanytsia")],
         [InlineKeyboardButton(text="Вишкільний цент у Винниках", callback_data="vynnyky")],
-        [InlineKeyboardButton(text="Хоткевича, 16А", callback_data="khotkevycha")],
-        [InlineKeyboardButton(text="Тютюнників, 25", callback_data="tyutyunnykiv")],
-        [InlineKeyboardButton(text="Коциловського, 16", callback_data="kotsylovskogo")],
-        [InlineKeyboardButton(text="Котляревського, 17", callback_data="kotlyarevskogo")],
-        [InlineKeyboardButton(text="Житомирська, 12", callback_data="zhytomyrska")],
+        # [InlineKeyboardButton(text="Хоткевича, 16А", callback_data="khotkevycha")],
+        # [InlineKeyboardButton(text="Тютюнників, 25", callback_data="tyutyunnykiv")],
+        # [InlineKeyboardButton(text="Коциловського, 16", callback_data="kotsylovskogo")],
+        # [InlineKeyboardButton(text="Котляревського, 17", callback_data="kotlyarevskogo")],
+        # [InlineKeyboardButton(text="Житомирська, 12", callback_data="zhytomyrska")],
         [InlineKeyboardButton(text="Хочу отримати лист-дозвіл на інше приміщення", callback_data="lysty")]
     ]
 
