@@ -13,6 +13,7 @@ import pytz
 from calendars import STANYTSIA_TEAMUP_API_KEY, STANYTSIA_TEAMUP_CALENDAR_ID
 from . import db_booking
 from .booking_menu import fetch_calendar_events, add_calendar_event, check_event_conflicts
+from handlers.start_menu import user_db
 
 router = Router()
 bot = Bot(bots.main_bot)
@@ -102,7 +103,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
             db.add_book_reg(
                 user_id=message.from_user.id,
                 user_name=message.from_user.first_name, 
-                user_surname=message.from_user.last_name,  #з стартменю брати інфу
+                user_surname=message.from_user.last_name,
                 user_domivka="станиця",
                 user_room=data["stanytsia_number_of_room"],      
                 user_date=data["stanytsia_day"],

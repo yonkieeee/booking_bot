@@ -12,6 +12,7 @@ from datetime import datetime
 import pytz
 from calendars import STANYTSIA_TEAMUP_API_KEY, STANYTSIA_TEAMUP_CALENDAR_ID
 from . import db_booking
+from handlers.start_menu import user_db
 
 router = Router()
 
@@ -83,7 +84,7 @@ async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_
         "title": data[domivka+"_"+"booking_name"],
         "start_dt": start_dt,
         "end_dt": end_dt,
-        #треба додати who: "дані з буд про ім'я користувача"
+        #"who": user_db.DataBase.get_surname() + " " + user_db.DataBase.get_name()
     }
     print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
     response = requests.post(url, headers=headers, json=event_data)
