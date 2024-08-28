@@ -80,9 +80,10 @@ async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_
     headers = {"Teamup-Token": TEAMUP_API_KEY, "Content-Type": "application/json"}
     event_data = {
         "subcalendar_ids": [data[domivka+"_"+"number_of_room"]],
-        "title": [data[domivka+"_"+"booking_name"]],
+        "title": data[domivka+"_"+"booking_name"],
         "start_dt": start_dt,
         "end_dt": end_dt,
+        #треба додати who: "дані з буд про ім'я користувача"
     }
     print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
     response = requests.post(url, headers=headers, json=event_data)

@@ -56,14 +56,10 @@ room_inline = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="201", callback_data="201"),
-            InlineKeyboardButton(text="203", callback_data="203"),
-        ],
-        [
             InlineKeyboardButton(text="206", callback_data="206"),
-            InlineKeyboardButton(text="207", callback_data="207"),
         ],
         [
-            InlineKeyboardButton(text="204", callback_data="204"),
+            InlineKeyboardButton(text="208", callback_data="208"),
             InlineKeyboardButton(text="303", callback_data="303"),
         ],
     ]
@@ -77,17 +73,29 @@ vynnykykb = InlineKeyboardMarkup(
         ]
     ]
 )
-vynnyky_rooms = ReplyKeyboardMarkup(
-    keyboard=[
+vynnyky_room_inline = InlineKeyboardMarkup(
+    inline_keyboard=[
         [
-            KeyboardButton(text="кімната 1"),
-            KeyboardButton(text="кімната 2")
-        ]
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-    input_field_placeholder="Обери кімнату",
-    selective=True
+           InlineKeyboardButton(text="Кухня", callback_data="kukhnya"),
+        ],
+        [
+            
+            InlineKeyboardButton(text="Поверх 1", callback_data="poverkh_1"),
+        ],
+        [
+            InlineKeyboardButton(text="Поверх 2, кімната 1", callback_data="poverkh2_kimnata1"),
+        ],
+        [
+            InlineKeyboardButton(text="Поверх 2, кімната 2", callback_data="poverkh2_kimnata2"),
+        ],
+        [
+            InlineKeyboardButton(text="Поверх 2, кімната 3", callback_data="poverkh2_kimnata3"),
+        ],
+        [
+            InlineKeyboardButton(text="Поверх 2, кімната 4", callback_data="poverkh2_kimnata4"),
+        ],
+        
+    ]
 )
 
 khotkevychakb = InlineKeyboardMarkup(

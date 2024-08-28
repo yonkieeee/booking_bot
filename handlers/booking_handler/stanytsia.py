@@ -77,7 +77,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
     await state.update_data(stanytsia_end_time=message.text)
     data = await state.get_data()
     
-    room_mapping = {"303": 13281316, "203": 13281315}
+    room_mapping = {"303": 13281316, "201": 13281315, "206": 13281315, "208": 13281315}
     if data["stanytsia_number_of_room"] in room_mapping:
         data["stanytsia_number_of_room"] = room_mapping[data["stanytsia_number_of_room"]]
     else:
