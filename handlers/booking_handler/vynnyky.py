@@ -2,6 +2,8 @@ import asyncio
 import requests
 import re
 from aiogram import Bot, Dispatcher, F, types, Router
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums.parse_mode import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
@@ -16,7 +18,7 @@ from .booking_menu import fetch_calendar_events, add_calendar_event, check_event
 from handlers.start_menu import user_db
 
 router = Router()
-bot = Bot(bots.main_bot)
+bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
 class vynnyky_Bookingreg(StatesGroup):
@@ -100,12 +102,13 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
     else:
         response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky")
         if 'event' in response:
+            user_db_obj = user_db.DataBase("db_plast.db")
             db = db_booking.Booking_DataBase("db_plast.db")
             db.add_book_reg(
                 user_id=message.from_user.id,
-                user_name=message.from_user.first_name, 
-                user_surname=message.from_user.last_name,
-                user_domivka="станиця",
+                user_name=user_db_obj.get_name(message.from_user.id), 
+                user_surname=user_db_obj.get_surname(message.from_user.id),
+                user_domivka="винники",
                 user_room=data["vynnyky_number_of_room"],      
                 user_date=data["vynnyky_day"],
                 user_start_time=data["vynnyky_start_time"],

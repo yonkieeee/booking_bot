@@ -1,6 +1,8 @@
 import asyncio
 import requests
 import re
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums.parse_mode import ParseMode
 from aiogram import Bot, Dispatcher, F, types, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -15,20 +17,20 @@ from . import db_booking
 from handlers.start_menu import user_db
 
 router = Router()
-
-bot = Bot(bots.main_bot)
+bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 @router.message(F.text.lower() == "бронювання")
 async def booking(message: types.Message):
     await message.reply(
-        'В цьому розділі ви можете забронювати приміщення. Але Перш ніж це зробити ознайомтесь з <a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a>.        \n'
-        "Натискаючи кнопку 'так, підтверджую, ти погоджуєшся з усіма праилами та забов'язуєшся їх виконувати",
-        reply_markup=keyboards.approovancebuilder.as_markup()
-    )
+    'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма праилами та забов\'язуєшся їх виконувати',
+    reply_markup=keyboards.approovancebuilder.as_markup(),
+    parse_mode=ParseMode.HTML
+)
+
 
 @router.callback_query(F.data == "approoved")
 async def chooselocation(callback: types.CallbackQuery):
-    await callback.message.answer("Обери приміщення", reply_markup=keyboards.bookingk)
+    await callback.message.answer("Обери приміщення:", reply_markup=keyboards.bookingk)
 
 @router.callback_query(F.data == "non_approoved")
 async def chooselocation(callback: types.CallbackQuery):
