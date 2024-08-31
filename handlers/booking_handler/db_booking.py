@@ -40,37 +40,22 @@ class Booking_DataBase:
         self.session.add(new_booking)
         self.session.commit()
 
-        def get_domivka(self, user_id):
-            domivkas = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
+    def get_all_data(self, user_id):
+        records = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
 
-            return [record.domivka for record in domivkas]
+        return [
+            {
+                "domivka": record.domivka,
+                "room": record.room,
+                "date": record.date,
+                "start_time": record.start_time,
+                "end_time": record.end_time,
+                "code": record.code
+             }
+            for record in records
+        ]
 
-        def get_room(self, user_id):
-            rooms = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
-
-            return [record.room for record in rooms]
-
-        def get_date(self, user_id):
-            dates = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
-
-            return [record.date for record in dates]
-
-        def get_start_time(self, user_id):
-            start_times = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
-
-            return [record.start_time for record in start_times]
-
-        def get_end_time(self, user_id):
-            end_times = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
-
-            return [record.end_time for record in end_times]
-
-        def get_code(self, user_id):
-            codes = self.session.query(Book_Reg).filter_by(user_id=user_id).all()
-
-            return [record.code for record in codes]
-
-        def delete_booking(self, id_user, user_code):
-            self.session.query(Book_Reg).filter_by(user_id=id_user, code=user_code).delete()
-            self.session.commit()
+    def delete_booking(self, id_user, user_code):
+        self.session.query(Book_Reg).filter_by(user_id=id_user, code=user_code).delete()
+        self.session.commit()
 
