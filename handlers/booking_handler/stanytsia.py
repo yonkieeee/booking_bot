@@ -31,7 +31,7 @@ class Stanytsia_Bookingreg(StatesGroup):
 
 @router.callback_query(F.data == "stanytsia")
 async def bookstanytsia(callback: types.CallbackQuery):
-    await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік", reply_markup=keyboards.stanytsiakb)
+    await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік 📅", reply_markup=keyboards.stanytsiakb)
 
 @router.callback_query(F.data == "RegistrateBookingStanytsia")
 async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
@@ -48,13 +48,13 @@ async def reg_stanytsia_two(message: Message, state: FSMContext):
 async def reg_stanytsia_three(callback: CallbackQuery, state: FSMContext):
     await state.update_data(stanytsia_number_of_room=callback.data)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_day)
-    await callback.message.answer("Введи день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
+    await callback.message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
 
 @router.message(Stanytsia_Bookingreg.stanytsia_day)
 async def reg_stanytsia_four(message: Message, state: FSMContext):
     date_pattern = r"^\d{4}-\d{2}-\d{2}$"
     if not re.match(date_pattern, message.text):
-        await message.answer("Неправильний формат дати. Будь ласка, введи день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
+        await message.answer("Неправильний формат дати. Будь ласка, введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
         return
     await state.update_data(stanytsia_day=message.text)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_start_time)
@@ -64,7 +64,7 @@ async def reg_stanytsia_four(message: Message, state: FSMContext):
 async def reg_stanytsia_five(message: Message, state: FSMContext):
     time_pattern = r"^\d{2}:\d{2}$"
     if not re.match(time_pattern, message.text):
-        await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. Наприклад 15:00")
+        await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. \n ⏰Наприклад 15:00")
         return
     await state.update_data(stanytsia_start_time=message.text)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_end_time)
@@ -75,13 +75,14 @@ async def reg_stanytsia_five(message: Message, state: FSMContext):
 async def reg_stanytsia_six(message: Message, state: FSMContext):
     time_pattern = r"^\d{2}:\d{2}$"
     if not re.match(time_pattern, message.text):
-        await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. Наприклад 16:00")
+        await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
         return
     await state.update_data(stanytsia_end_time=message.text)
     data = await state.get_data()
     
     room_mapping = {"303": 13281316, "201": 13281315, "206": 13281315, "208": 13281315}
     if data["stanytsia_number_of_room"] in room_mapping:
+        room = data["stanytsia_number_of_room"]
         data["stanytsia_number_of_room"] = room_mapping[data["stanytsia_number_of_room"]]
     else:
         await message.answer("Ти ввів неправильний номер кімнати. Зареєструй бронювання ще раз.")
@@ -97,7 +98,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
     if await check_event_conflicts(data["stanytsia_number_of_room"], start_datetime.isoformat(), end_datetime.isoformat(), STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY):
         await message.answer("На цей час у вибраній кімнаті вже є подія. Вибери інший час.")
         await state.set_state(Stanytsia_Bookingreg.stanytsia_day)  # повернення до дати
-        await message.answer("Введи день у форматі РРРР-ММ-ДД. Наприклад: 2024-05-20")
+        await message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
     else:
         response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY, "stanytsia")
         if 'event' in response:
@@ -108,7 +109,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 user_name=user_db_obj.get_name(message.from_user.id), 
                 user_surname=user_db_obj.get_surname(message.from_user.id),
                 user_domivka="станиця",
-                user_room=data["stanytsia_number_of_room"],      
+                user_room=room,
                 user_date=data["stanytsia_day"],
                 user_start_time=data["stanytsia_start_time"],
                 user_end_time=data["stanytsia_end_time"],
@@ -118,10 +119,3 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         else:
             await message.answer("Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
         await state.clear()
-
-    # Debugging print statements
-    print(data["stanytsia_booking_name"])
-    print(data["stanytsia_number_of_room"])
-    print(data["stanytsia_start_time"])
-    print(data["stanytsia_end_time"])
-

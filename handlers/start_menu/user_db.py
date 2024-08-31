@@ -59,7 +59,7 @@ class DataBase:
     def get_surname(self, user_id):
         with self.connection:
             result = self.cursor.execute(
-                '''SELECT "user_name" FROM "users" WHERE "user_id" = ?''',
+                '''SELECT "user_surname" FROM "users" WHERE "user_id" = ?''',
                 (user_id,)
             ).fetchall()
             for row in result:
