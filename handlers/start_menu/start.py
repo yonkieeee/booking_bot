@@ -78,8 +78,7 @@ async def reg_phone(message: Message, state: FSMContext):
 @router.message(registrate_user.user_email)
 async def reg_email(message: Message, state: FSMContext):
     db.set_email(message.from_user.id, message.text)
-    await message.answer("Реєстрація всьо")
-    await message.answer(reply_markup=keyboards.mainkb)
+    await message.answer("Реєстрація всьо", reply_markup=keyboards.mainkb)
     await state.clear()
 
 
