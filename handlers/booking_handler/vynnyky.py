@@ -101,7 +101,7 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
         await state.set_state(vynnyky_Bookingreg.vynnyky_day)  # повернення до дати
         await message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
     else:
-        response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky")
+        response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky", message)
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db")
             db = db_booking.Booking_DataBase("db_plast.db")
@@ -109,14 +109,14 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
                 user_id=message.from_user.id,
                 user_name=user_db_obj.get_name(message.from_user.id), 
                 user_surname=user_db_obj.get_surname(message.from_user.id),
-                user_domivka="винники",
+                user_domivka="Винники",
                 user_room=room,      
                 user_date=data["vynnyky_day"],
                 user_start_time=data["vynnyky_start_time"],
                 user_end_time=data["vynnyky_end_time"],
                 code_of_booking=response['event'].get('id', 'no_code') 
             )
-            await message.answer('Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice')
+            await message.answer('Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice', parse_mode=ParseMode.HTML)
         else:
             await message.answer("Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
         await state.clear()

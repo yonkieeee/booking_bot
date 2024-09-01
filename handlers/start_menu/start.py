@@ -27,7 +27,7 @@ async def start(message: Message, state: FSMContext):
         db.add_user(message.from_user.id)
         db.set_nickname(message.from_user.id, message.from_user.username)
         await message.answer(
-            "Привіт, я чат бот станиці Львів, створений аби облегшити взаємодію між тобою та станицею."
+            "Привіт 👋, я чат бот станиці Львів, створений аби облегшити взаємодію між тобою та станицею."
             " Для початку тобі потрібно зареєструватись."
         )
         await message.answer("Введи своє ім'я")
@@ -50,7 +50,7 @@ async def reg_name(message: Message, state: FSMContext):
 async def reg_surname(message: Message, state: FSMContext):
     if not bools.find_symbol(message.text):
         db.set_surname(message.from_user.id, message.text)
-        await message.answer("Введи свій вік(DD.MM.YYYY)")
+        await message.answer("Введи свою дату народження(DD.MM.YYYY)")
         await state.set_state(registrate_user.user_age)
     else:
         await message.answer("fef")
@@ -60,7 +60,7 @@ async def reg_surname(message: Message, state: FSMContext):
 async def reg_age(message: Message, state: FSMContext):
     if bools.check_age_num(message.text):
         db.set_age(message.from_user.id, message.text)
-        await message.answer("Поділись своїм номером телефону",
+        await message.answer("Поділись своїм номером телефону ☎️",
                              reply_markup=kb.phone_kb)
         await state.set_state(registrate_user.user_phone)
     else:
@@ -70,7 +70,7 @@ async def reg_age(message: Message, state: FSMContext):
 @router.message(registrate_user.user_phone)
 async def reg_phone(message: Message, state: FSMContext):
     db.set_phone(message.from_user.id, message.contact.phone_number)
-    await message.answer("Введи свою електронну адресу",
+    await message.answer("Введи свою електронну адресу 📧",
                          reply_markup=ReplyKeyboardRemove())
     await state.set_state(registrate_user.user_email)
 
@@ -78,7 +78,7 @@ async def reg_phone(message: Message, state: FSMContext):
 @router.message(registrate_user.user_email)
 async def reg_email(message: Message, state: FSMContext):
     db.set_email(message.from_user.id, message.text)
-    await message.answer("Реєстрація всьо", reply_markup=keyboards.mainkb)
+    await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
     await state.clear()
 
 

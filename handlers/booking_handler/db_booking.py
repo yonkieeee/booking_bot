@@ -58,4 +58,12 @@ class Booking_DataBase:
     def delete_booking(self, id_user, user_code):
         self.session.query(Book_Reg).filter_by(user_id=id_user, code=user_code).delete()
         self.session.commit()
+        
+    def get_domivka(self, code):
+        record = self.session.query(Book_Reg).filter_by(code=code).first()
+        if record:
+            return record.domivka
+        else:
+            return None
 
+        
