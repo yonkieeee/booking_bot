@@ -22,7 +22,7 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 @router.message(F.text.lower() == "бронювання")
 async def booking(message: types.Message):
     await message.reply(
-    'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма праилами та забов\'язуєшся їх виконувати',
+    'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма правилами та забов\'язуєшся їх виконувати',
     reply_markup=keyboards.approovancebuilder.as_markup(),
     parse_mode=ParseMode.HTML
 )
@@ -42,7 +42,7 @@ async def fetch_calendar_events(subcalendar_id, start_dt, end_dt, TEAMUP_CALENDA
     params = {
         "startDate": start_dt,
         "endDate": end_dt,
-        "subcalendarId[]": [subcalendar_id]  # Make sure this is an array
+        "subcalendarId[]": [subcalendar_id]  
     }
     headers = {"Teamup-Token": TEAMUP_API_KEY}
     response = requests.get(url, headers=headers, params=params)
@@ -78,15 +78,17 @@ async def check_event_conflicts(subcalendar_id, new_start, new_end, TEAMUP_CALEN
 
 
 
-async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_API_KEY, domivka):
+async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_API_KEY, domivka, message):
     url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
     headers = {"Teamup-Token": TEAMUP_API_KEY, "Content-Type": "application/json"}
+    user_db_obj = user_db.DataBase("db_plast.db")
+    
     event_data = {
         "subcalendar_ids": [data[domivka+"_"+"number_of_room"]],
         "title": data[domivka+"_"+"booking_name"],
         "start_dt": start_dt,
         "end_dt": end_dt,
-        #"who": user_db.DataBase.get_surname() + " " + user_db.DataBase.get_name()
+        "who": user_db_obj.get_surname(message.from_user.id) + " " + user_db_obj.get_name(message.from_user.id)
     }
     print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
     response = requests.post(url, headers=headers, json=event_data)

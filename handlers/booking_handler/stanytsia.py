@@ -68,7 +68,7 @@ async def reg_stanytsia_five(message: Message, state: FSMContext):
         return
     await state.update_data(stanytsia_start_time=message.text)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_end_time)
-    await message.answer("Введи час початку у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
+    await message.answer("Введи час закінчення у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
 
 
 @router.message(Stanytsia_Bookingreg.stanytsia_end_time)
@@ -100,7 +100,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         await state.set_state(Stanytsia_Bookingreg.stanytsia_day)  # повернення до дати
         await message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
     else:
-        response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY, "stanytsia")
+        response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(), STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY, "stanytsia", message)
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db")
             db = db_booking.Booking_DataBase("db_plast.db")
@@ -108,14 +108,14 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 user_id=message.from_user.id,
                 user_name=user_db_obj.get_name(message.from_user.id), 
                 user_surname=user_db_obj.get_surname(message.from_user.id),
-                user_domivka="станиця",
+                user_domivka="Cтаниця",
                 user_room=room,
                 user_date=data["stanytsia_day"],
                 user_start_time=data["stanytsia_start_time"],
                 user_end_time=data["stanytsia_end_time"],
                 code_of_booking=response['event'].get('id', 'no_code') 
             )
-            await message.answer('Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice')
+            await message.answer('Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice', parse_mode=ParseMode.HTML)
         else:
             await message.answer("Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
         await state.clear()
