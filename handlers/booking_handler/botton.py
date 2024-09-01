@@ -10,7 +10,7 @@ import calendars
 router = Router()
 db = Booking_DataBase("db_plast.db")
 
-@router.message(F.text.lower() == 'глянути всі бронювання')
+@router.message(F.text.lower() == 'Переглянути всі мої бронювання')
 async def view_bookings(message: types.Message):
     active_bookings = db.get_all_data(message.from_user.id)
     current_time = datetime.now().replace(second=0, microsecond=0)

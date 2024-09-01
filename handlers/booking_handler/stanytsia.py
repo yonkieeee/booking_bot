@@ -31,7 +31,7 @@ class Stanytsia_Bookingreg(StatesGroup):
 
 @router.callback_query(F.data == "stanytsia")
 async def bookstanytsia(callback: types.CallbackQuery):
-    await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік 📅", reply_markup=keyboards.stanytsiakb)
+    await callback.message.answer("Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅", reply_markup=keyboards.stanytsiakb, parse_mode=ParseMode.HTML)
 
 @router.callback_query(F.data == "RegistrateBookingStanytsia")
 async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
