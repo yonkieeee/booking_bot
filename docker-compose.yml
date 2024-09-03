@@ -1,0 +1,11 @@
+version: "1"
+
+services:
+  plast_tg_bot:
+    build: .
+    container_name: plast_tg_bot_con
+    volumes:
+      - "./data:/app/data"
+    ports:
+      - 8000:8000
+    restart: always
