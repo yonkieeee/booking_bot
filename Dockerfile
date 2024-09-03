@@ -12,4 +12,6 @@ RUN pip install pytz
 
 COPY . .
 
+COPY ./db_plast.db /app/db_plast.db
+
 CMD ["python", "main.py"]

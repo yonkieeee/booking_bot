@@ -11,6 +11,7 @@ class Book_Reg(Base):
     user_id = Column(Integer, nullable=False)
     name = Column(String)
     surname = Column(String)
+    name_of_booking = Column(String)
     domivka = Column(String)
     room = Column(String)
     date = Column(String)
@@ -26,11 +27,12 @@ class Booking_DataBase:
         session = sessionmaker(bind=self.engine)
         self.session = session()
 
-    def add_book_reg(self, user_id, user_name, user_surname,
+    def add_book_reg(self, user_id, user_name, user_surname, user_name_of_booking,
                      user_domivka, user_room, user_date, user_start_time, user_end_time, code_of_booking):
         new_booking = Book_Reg(user_id=user_id,
                                name=user_name,
                                surname=user_surname,
+                               name_of_booking = user_name_of_booking,
                                domivka=user_domivka,
                                room=user_room,
                                date=user_date,
@@ -45,6 +47,7 @@ class Booking_DataBase:
 
         return [
             {
+                "name_of_booking": record.name_of_booking,
                 "domivka": record.domivka,
                 "room": record.room,
                 "date": record.date,
