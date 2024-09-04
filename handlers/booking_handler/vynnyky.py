@@ -81,7 +81,7 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
     await state.update_data(vynnyky_end_time=message.text)
     data = await state.get_data()
     
-    vynnyky_room_mapping = {"kukhnya": 13281316, "poverkh_1": 13281315, "poverkh2_kimnata1": 13281315, "poverkh2_kimnata2": 13281315, "poverkh2_kimnata3": 13281315, "poverkh2_kimnata4": 13281315}
+    vynnyky_room_mapping = {"Кухня": 13281316, "Поверх 1": 13281315, "Поверх 2, кімната 1": 13281315, "Поверх 2, кімната 2": 13281315, "Поверх 2, кімната 3": 13281315, "Поверх 2, кімната 4": 13281315}
     if data["vynnyky_number_of_room"] in vynnyky_room_mapping:
         room = data["vynnyky_number_of_room"]
         data["vynnyky_number_of_room"] = vynnyky_room_mapping[data["vynnyky_number_of_room"]]

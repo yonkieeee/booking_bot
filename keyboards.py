@@ -76,23 +76,23 @@ vynnykykb = InlineKeyboardMarkup(
 vynnyky_room_inline = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-           InlineKeyboardButton(text="Кухня", callback_data="kukhnya"),
+           InlineKeyboardButton(text="Кухня", callback_data="Кухня"),
         ],
         [
             
-            InlineKeyboardButton(text="Поверх 1", callback_data="poverkh_1"),
+            InlineKeyboardButton(text="Поверх 1", callback_data="Поверх 1"),
         ],
         [
-            InlineKeyboardButton(text="Поверх 2, кімната 1", callback_data="poverkh2_kimnata1"),
+            InlineKeyboardButton(text="Поверх 2, кімната 1", callback_data="Поверх 2, кімната 1"),
         ],
         [
-            InlineKeyboardButton(text="Поверх 2, кімната 2", callback_data="poverkh2_kimnata2"),
+            InlineKeyboardButton(text="Поверх 2, кімната 2", callback_data="Поверх 2, кімната 2"),
         ],
         [
-            InlineKeyboardButton(text="Поверх 2, кімната 3", callback_data="poverkh2_kimnata3"),
+            InlineKeyboardButton(text="Поверх 2, кімната 3", callback_data="Поверх 2, кімната 3"),
         ],
         [
-            InlineKeyboardButton(text="Поверх 2, кімната 4", callback_data="poverkh2_kimnata4"),
+            InlineKeyboardButton(text="Поверх 2, кімната 4", callback_data="Поверх 2, кімната 4"),
         ],
         
     ]
