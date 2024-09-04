@@ -108,6 +108,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 user_id=message.from_user.id,
                 user_name=user_db_obj.get_name(message.from_user.id), 
                 user_surname=user_db_obj.get_surname(message.from_user.id),
+                user_name_of_booking=data["stanytsia_booking_name"],
                 user_domivka="Cтаниця",
                 user_room=room,
                 user_date=data["stanytsia_day"],
