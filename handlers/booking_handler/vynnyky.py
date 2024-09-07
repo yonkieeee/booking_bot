@@ -89,8 +89,8 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
     await state.update_data(vynnyky_end_time=message.text)
     data = await state.get_data()
 
-    vynnyky_room_mapping = {"kukhnya": 13281316, "poverkh_1": 13281315, "poverkh2_kimnata1": 13281315,
-                            "poverkh2_kimnata2": 13281315, "poverkh2_kimnata3": 13281315, "poverkh2_kimnata4": 13281315}
+    vynnyky_room_mapping = {"Кухня": 13281316, "Поверх 1": 13281315, "Поверх 2, кімната 1": 13281315,
+                            "Поверх 2, кімната 2": 13281315, "Поверх 2, кімната 3": 13281315, "Поверх 2, кімната 4": 13281315}
     if data["vynnyky_number_of_room"] in vynnyky_room_mapping:
         room = data["vynnyky_number_of_room"]
         data["vynnyky_number_of_room"] = vynnyky_room_mapping[data["vynnyky_number_of_room"]]
@@ -134,6 +134,21 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
             await message.answer(
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
                 parse_mode=ParseMode.HTML)
+            if user_db_obj['user_nickname'] == None:
+                nickname_text = ''
+            else:
+                nickname_text = f'\nНікнейм @{user_db_obj['user_nickname']}\n'
+
+            await bot.send_message(chat_id=-1002421947656,
+                                   text=f'''Бронювання № {response['event'].get('id', 'no_code')}
+Ім'я: {user_db_obj['user_name']}
+Прізвище: {user_db_obj['user_surname']}
+Номер телефону: {user_db_obj['user_phone']}{nickname_text}
+Домівка: Станиця
+Кімната: {room}
+День: {data["vynnyky_day"]}
+Час: {data["vynnyky_start_time"]} - {data["vynnyky_end_time"]}
+''')
         else:
             await message.answer(
                 "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
