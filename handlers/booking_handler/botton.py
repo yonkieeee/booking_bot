@@ -1,4 +1,7 @@
-from aiogram import Router, F, types
+from aiogram import Router, F, Bot
+from aiogram import types
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums.parse_mode import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, CallbackQuery
 from handlers.booking_handler.db_booking import Booking_DataBase
@@ -8,9 +11,11 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from datetime import datetime
 import keyboards
+import bots
 
 router = Router()
 db = Booking_DataBase("db_plast.db")
+bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
 @router.message(F.text.lower() == 'глянути всі бронювання')
@@ -49,11 +54,14 @@ async def view_bookings(message: types.Message):
 async def delete_booking(callback_query: CallbackQuery):
     booking_code = callback_query.data[7:]
     user_id = callback_query.from_user.id
+
     db.delete_booking(user_id, booking_code)
 
     await callback_query.message.delete()
 
     await callback_query.message.answer(f"Бронювання №{booking_code} успішно видалено.")
+    await bot.send_message(chat_id=-1002421947656,
+                           text=f'''Скасовано бронювання №{booking_code}''')
 
 
 @router.message(F.text.lower() == 'повернутись до меню')

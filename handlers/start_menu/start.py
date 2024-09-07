@@ -1,6 +1,4 @@
-
-
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, ReplyKeyboardRemove
 from handlers.start_menu.user_db import DataBase
@@ -14,6 +12,7 @@ router = Router()
 db = DataBase("db_plast.db")
 reg_info = []
 
+
 class registrate_user(StatesGroup):
     user_name = State()
     user_surname = State()
@@ -25,14 +24,25 @@ class registrate_user(StatesGroup):
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     if not db.user_exists(message.from_user.id):
-        await message.answer(
-            "Привіт 👋, я чат бот станиці Львів, створений аби облегшити взаємодію між тобою та станицею."
-            " Для початку тобі потрібно зареєструватись."
-        )
-        await message.answer("Введи своє ім'я")
-        await state.set_state(registrate_user.user_name)
+        await message.answer('''Привіт 👋, я бот для бронювань приміщень Пласту у Львові!" 
+З моєю допомогою ти зможеш: 
+    📍 Забронювати приміщення в пластовій домівці 
+    📍 Воно одразу з'явиться в календарі бронювання 
+    📍 Тобі не потрібно чекати на відповідь адміна 
+    📍 Зможеш обрати зручний час та зробити бронювання самостійно  
+    📍Є можливість перегляду активних бронювань та скасувати їх за потреби 
+Якщо ти хочеш скористатись ботом, тобі необхідно зареєструватись. Так нам буде простіше співпрацювати далі🤝''',
+                             reply_markup=kb.start_reg
+                             )
+
     else:
         await message.answer("Обери секцію", reply_markup=keyboards.mainkb)
+
+
+@router.message(F.text == 'Зареєструватись')
+async def start_of_reg(message: Message, state: FSMContext):
+    await message.answer("Введи своє ім'я")
+    await state.set_state(registrate_user.user_name)
 
 
 @router.message(registrate_user.user_name)
@@ -76,7 +86,6 @@ async def reg_phone(message: Message, state: FSMContext):
 
 @router.message(registrate_user.user_email)
 async def reg_email(message: Message, state: FSMContext):
-
     reg_info.append(message.text)
 
     name, surname, age, phone, email = reg_info

@@ -138,6 +138,22 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
                 parse_mode=ParseMode.HTML)
 
+            if user_db_obj['user_nickname'] == None:
+                nickname_text = ''
+            else:
+                nickname_text = f'\nНікнейм @{user_db_obj['user_nickname']}\n'
+
+            await bot.send_message(chat_id=-1002421947656,
+                                   text=f'''Бронювання № {response['event'].get('id', 'no_code')}
+Ім'я: {user_db_obj['user_name']}
+Прізвище: {user_db_obj['user_surname']}
+Номер телефону: {user_db_obj['user_phone']}{nickname_text}
+Домівка: Станиця
+Кімната: {room}
+День: {data["stanytsia_day"]}
+Час: {data["stanytsia_start_time"]} - {data["stanytsia_end_time"]}
+''')
+
         else:
             await message.answer(
                 "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
