@@ -12,6 +12,7 @@ import keyboards
 
 router = Router()
 db = DataBase("db_plast.db")
+reg_info = []
 
 class registrate_user(StatesGroup):
     user_name = State()
@@ -24,8 +25,6 @@ class registrate_user(StatesGroup):
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     if not db.user_exists(message.from_user.id):
-        db.add_user(message.from_user.id)
-        db.set_nickname(message.from_user.id, message.from_user.username)
         await message.answer(
             "Привіт 👋, я чат бот станиці Львів, створений аби облегшити взаємодію між тобою та станицею."
             " Для початку тобі потрібно зареєструватись."
@@ -39,7 +38,7 @@ async def start(message: Message, state: FSMContext):
 @router.message(registrate_user.user_name)
 async def reg_name(message: Message, state: FSMContext):
     if not bools.find_symbol(message.text):
-        db.set_name(message.from_user.id, message.text)
+        reg_info.append(message.text)
         await message.answer("Введи своє прізвище")
         await state.set_state(registrate_user.user_surname)
     else:
@@ -49,7 +48,7 @@ async def reg_name(message: Message, state: FSMContext):
 @router.message(registrate_user.user_surname)
 async def reg_surname(message: Message, state: FSMContext):
     if not bools.find_symbol(message.text):
-        db.set_surname(message.from_user.id, message.text)
+        reg_info.append(message.text)
         await message.answer("Введи свою дату народження(DD.MM.YYYY)")
         await state.set_state(registrate_user.user_age)
     else:
@@ -59,7 +58,7 @@ async def reg_surname(message: Message, state: FSMContext):
 @router.message(registrate_user.user_age)
 async def reg_age(message: Message, state: FSMContext):
     if bools.check_age_num(message.text):
-        db.set_age(message.from_user.id, message.text)
+        reg_info.append(message.text)
         await message.answer("Поділись своїм номером телефону ☎️",
                              reply_markup=kb.phone_kb)
         await state.set_state(registrate_user.user_phone)
@@ -69,7 +68,7 @@ async def reg_age(message: Message, state: FSMContext):
 
 @router.message(registrate_user.user_phone)
 async def reg_phone(message: Message, state: FSMContext):
-    db.set_phone(message.from_user.id, message.contact.phone_number)
+    reg_info.append(message.contact.phone_number)
     await message.answer("Введи свою електронну адресу 📧",
                          reply_markup=ReplyKeyboardRemove())
     await state.set_state(registrate_user.user_email)
@@ -77,7 +76,21 @@ async def reg_phone(message: Message, state: FSMContext):
 
 @router.message(registrate_user.user_email)
 async def reg_email(message: Message, state: FSMContext):
-    db.set_email(message.from_user.id, message.text)
+
+    reg_info.append(message.text)
+
+    name, surname, age, phone, email = reg_info
+
+    db.add_user(user_id=message.from_user.id,
+                user_nickname=message.from_user.username,
+                user_name=name,
+                user_surname=surname,
+                user_age=age,
+                user_phone=phone,
+                user_email=email)
+
+    reg_info.clear()
+
     await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
     await state.clear()
 

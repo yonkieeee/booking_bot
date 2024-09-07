@@ -5,7 +5,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from aiogram import Bot, Dispatcher, F, types, Router
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, \
+    CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 import bots
@@ -19,18 +20,20 @@ from handlers.start_menu import user_db
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
+
 @router.message(F.text.lower() == "бронювання")
 async def booking(message: types.Message):
     await message.reply(
-    'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма правилами та забов\'язуєшся їх виконувати',
-    reply_markup=keyboards.approovancebuilder.as_markup(),
-    parse_mode=ParseMode.HTML
-)
+        'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма правилами та забов\'язуєшся їх виконувати',
+        reply_markup=keyboards.approovancebuilder.as_markup(),
+        parse_mode=ParseMode.HTML
+    )
 
 
 @router.callback_query(F.data == "approoved")
 async def chooselocation(callback: types.CallbackQuery):
     await callback.message.answer("Обери приміщення:", reply_markup=keyboards.bookingk)
+
 
 @router.callback_query(F.data == "non_approoved")
 async def chooselocation(callback: types.CallbackQuery):
@@ -42,7 +45,7 @@ async def fetch_calendar_events(subcalendar_id, start_dt, end_dt, TEAMUP_CALENDA
     params = {
         "startDate": start_dt,
         "endDate": end_dt,
-        "subcalendarId[]": [subcalendar_id]  
+        "subcalendarId[]": [subcalendar_id]
     }
     headers = {"Teamup-Token": TEAMUP_API_KEY}
     response = requests.get(url, headers=headers, params=params)
@@ -57,38 +60,38 @@ async def fetch_calendar_events(subcalendar_id, start_dt, end_dt, TEAMUP_CALENDA
 
 async def check_event_conflicts(subcalendar_id, new_start, new_end, TEAMUP_CALENDAR_ID, TEAMUP_API_KEY):
     print(f"Fetching existing events for room {subcalendar_id} from {new_start} to {new_end}")
-    
-    existing_events = await fetch_calendar_events(subcalendar_id, new_start, new_end, TEAMUP_CALENDAR_ID, TEAMUP_API_KEY)
-    
+
+    existing_events = await fetch_calendar_events(subcalendar_id, new_start, new_end, TEAMUP_CALENDAR_ID,
+                                                  TEAMUP_API_KEY)
+
     # Convert new_start and new_end to datetime objects
     new_start_dt = datetime.fromisoformat(new_start)
     new_end_dt = datetime.fromisoformat(new_end)
-    
+
     for event in existing_events:
         event_start = datetime.fromisoformat(event['start_dt'])
         event_end = datetime.fromisoformat(event['end_dt'])
-        
+
         print(f"Checking event {event['id']} from {event_start} to {event_end}")
         if (event_start < new_end_dt) and (event_end > new_start_dt):
             print("Conflict found!")
             return True  # Conflict found
-    
+
     print("No conflict found.")
     return False  # No conflict
-
 
 
 async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_API_KEY, domivka, message):
     url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
     headers = {"Teamup-Token": TEAMUP_API_KEY, "Content-Type": "application/json"}
-    user_db_obj = user_db.DataBase("db_plast.db")
-    
+    user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
+
     event_data = {
-        "subcalendar_ids": [data[domivka+"_"+"number_of_room"]],
-        "title": data[domivka+"_"+"booking_name"],
+        "subcalendar_ids": [data[domivka + "_" + "number_of_room"]],
+        "title": data[domivka + "_" + "booking_name"],
         "start_dt": start_dt,
         "end_dt": end_dt,
-        "who": user_db_obj.get_surname(message.from_user.id) + " " + user_db_obj.get_name(message.from_user.id)
+        "who": user_db_obj['user_name'] + " " + user_db_obj['user_surname']
     }
     print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
     response = requests.post(url, headers=headers, json=event_data)
