@@ -17,6 +17,7 @@ from calendars import VYNNYKY_TEAMUP_API_KEY, VYNNYKY_TEAMUP_CALENDAR_ID
 from . import db_booking
 from .booking_menu import fetch_calendar_events, add_calendar_event, check_event_conflicts
 from handlers.start_menu import user_db
+from handlers.booking_handler.botton_kb import create_cancel_button
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -117,7 +118,7 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
         response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(),
                                             VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky", message)
         if 'event' in response:
-            user_db_obj = user_db.DataBase("db_plast.db")
+            user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
             db = db_booking.Booking_DataBase("db_plast.db").get_all_data(message.from_user.id)
             db.add_book_reg(
                 user_id=message.from_user.id,
@@ -134,21 +135,22 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
             await message.answer(
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
                 parse_mode=ParseMode.HTML)
-            if user_db_obj['user_nickname'] == None:
+            if user_db_obj['user_nickname'] is None:
                 nickname_text = ''
             else:
-                nickname_text = f'\nНікнейм @{user_db_obj['user_nickname']}\n'
+                nickname_text = f'Нікнейм @{user_db_obj['user_nickname']}'
 
             await bot.send_message(chat_id=-1002421947656,
-                                   text=f'''Бронювання № {response['event'].get('id', 'no_code')}
+                                   text=f'''Бронювання #В{response['event'].get('id', 'no_code')}
 Ім'я: {user_db_obj['user_name']}
 Прізвище: {user_db_obj['user_surname']}
-Номер телефону: {user_db_obj['user_phone']}{nickname_text}
-Домівка: Станиця
+Номер телефону: {user_db_obj['user_phone']}
+{nickname_text}
+Домівка: Винники
 Кімната: {room}
 День: {data["vynnyky_day"]}
 Час: {data["vynnyky_start_time"]} - {data["vynnyky_end_time"]}
-''')
+''', reply_markup=create_cancel_button(user_db_obj['user_id'], response['event'].get('id', 'no_code'), 'В'))
         else:
             await message.answer(
                 "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")

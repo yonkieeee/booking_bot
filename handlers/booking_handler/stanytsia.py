@@ -17,6 +17,7 @@ from calendars import STANYTSIA_TEAMUP_API_KEY, STANYTSIA_TEAMUP_CALENDAR_ID
 from . import db_booking
 from .booking_menu import fetch_calendar_events, add_calendar_event, check_event_conflicts
 from handlers.start_menu import user_db
+from handlers.booking_handler.botton_kb import create_cancel_button
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -138,21 +139,22 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
                 parse_mode=ParseMode.HTML)
 
-            if user_db_obj['user_nickname'] == None:
+            if user_db_obj['user_nickname'] is None:
                 nickname_text = ''
             else:
-                nickname_text = f'\nНікнейм @{user_db_obj['user_nickname']}\n'
+                nickname_text = f'Нікнейм @{user_db_obj['user_nickname']}'
 
             await bot.send_message(chat_id=-1002421947656,
-                                   text=f'''Бронювання № {response['event'].get('id', 'no_code')}
+                                   text=f'''Бронювання #С{response['event'].get('id', 'no_code')}
 Ім'я: {user_db_obj['user_name']}
 Прізвище: {user_db_obj['user_surname']}
-Номер телефону: {user_db_obj['user_phone']}{nickname_text}
+Номер телефону: {user_db_obj['user_phone']}
+{nickname_text}
 Домівка: Станиця
 Кімната: {room}
 День: {data["stanytsia_day"]}
 Час: {data["stanytsia_start_time"]} - {data["stanytsia_end_time"]}
-''')
+''', reply_markup=create_cancel_button(user_db_obj['user_id'], response['event'].get('id', 'no_code'), 'С'))
 
         else:
             await message.answer(

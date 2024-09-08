@@ -40,9 +40,10 @@ async def view_bookings(message: types.Message):
         await message.answer("Актуальні бронювання", reply_markup=botton_kb.return_kb)
         for booking in valid_bookings:
             count = 0
-            cancel = botton_kb.create_cancel_button(booking['code'])
+            cancel = botton_kb.create_cancel_button(message.from_user.id, booking['code'],
+                                                    str(booking['domivka'])[0])
             await message.answer(
-                f"""Бронювання №: {booking['code']}
+                f"""Бронювання #{booking['domivka'][0]}{booking['code']}
 Назва: {booking['name_of_booking']}
 Домівка: {booking['domivka']}
 Кімната: {booking['room']}
@@ -52,16 +53,25 @@ async def view_bookings(message: types.Message):
 
 @router.callback_query(lambda c: c.data.startswith('cancel_'))
 async def delete_booking(callback_query: CallbackQuery):
-    booking_code = callback_query.data[7:]
-    user_id = callback_query.from_user.id
+    booking_info = callback_query.data[7:].split('_')
+    booking_code, user_id, domivka = booking_info
+    print(callback_query.data)
+    print(booking_info)
 
     db.delete_booking(user_id, booking_code)
 
     await callback_query.message.delete()
+    if callback_query.message.chat.id == -1002421947656:
+        await bot.send_message(chat_id=-1002421947656,
+                               text=f'''Скасовано бронювання #{domivka}{booking_code}''')
+        await bot.send_message(chat_id=user_id, text=f'''Твоє бронювання #{domivka}{booking_code} скасували''' )
+    else:
+        await callback_query.message.answer(f"Бронювання #{domivka}{booking_code} успішно скасовано.")
+        db.delete_booking(user_id, booking_code)
+        await bot.send_message(chat_id=-1002421947656,
+                               text=f'''Скасовано бронювання #{domivka}{booking_code}''')
 
-    await callback_query.message.answer(f"Бронювання №{booking_code} успішно видалено.")
-    await bot.send_message(chat_id=-1002421947656,
-                           text=f'''Скасовано бронювання №{booking_code}''')
+
 
 
 @router.message(F.text.lower() == 'повернутись до меню')
