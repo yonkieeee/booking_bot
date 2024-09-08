@@ -11,6 +11,9 @@ mainkb = ReplyKeyboardMarkup(
         [
             KeyboardButton(text="Бронювання"),
             KeyboardButton(text="Глянути всі бронювання")
+        ],
+        [
+            KeyboardButton(text='Переглянути профіль')
         ]
     ],
     resize_keyboard=True,

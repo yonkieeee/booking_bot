@@ -53,4 +53,6 @@ class DataBase:
             }
         return None
 
-
+    def user_delete(self, user_id):
+        self.session.query(User).filter_by(user_id=user_id).delete()
+        self.session.commit()

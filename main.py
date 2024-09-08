@@ -1,8 +1,11 @@
 import asyncio
+
 from aiogram import Bot, Dispatcher
+
+import bots
+from handlers.check_profile_handler import check_profile_main
 from handlers.booking_handler import booking_menu, stanytsia, vynnyky, botton
 from handlers.start_menu import start
-import bots
 
 
 async def main():
@@ -13,7 +16,8 @@ async def main():
         start.router,
         stanytsia.router,
         vynnyky.router,
-        botton.router
+        botton.router,
+        check_profile_main.router
     )
 
     await bot.delete_webhook(drop_pending_updates=True)
