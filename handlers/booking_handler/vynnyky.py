@@ -60,7 +60,7 @@ async def reg_vynnyky_three(callback: CallbackQuery, state: FSMContext):
 
 @router.message(vynnyky_Bookingreg.vynnyky_day)
 async def reg_vynnyky_four(message: Message, state: FSMContext):
-    date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+    date_pattern = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
     if not re.match(date_pattern, message.text):
         await message.answer(
             "Неправильний формат дати. Будь ласка, введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
@@ -72,7 +72,7 @@ async def reg_vynnyky_four(message: Message, state: FSMContext):
 
 @router.message(vynnyky_Bookingreg.vynnyky_start_time)
 async def reg_vynnyky_five(message: Message, state: FSMContext):
-    time_pattern = r"^\d{2}:\d{2}$"
+    time_pattern = r"^(?:[01]\d|2[0-3]):[0-5]\d$"
     if not re.match(time_pattern, message.text):
         await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. \n ⏰Наприклад 15:00")
         return
@@ -83,7 +83,7 @@ async def reg_vynnyky_five(message: Message, state: FSMContext):
 
 @router.message(vynnyky_Bookingreg.vynnyky_end_time)
 async def reg_vynnyky_six(message: Message, state: FSMContext):
-    time_pattern = r"^\d{2}:\d{2}$"
+    time_pattern = r"^(?:[01]\d|2[0-3]):[0-5]\d$"
     if not re.match(time_pattern, message.text):
         await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
         return
@@ -96,9 +96,9 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
         room = data["vynnyky_number_of_room"]
         data["vynnyky_number_of_room"] = vynnyky_room_mapping[data["vynnyky_number_of_room"]]
     else:
-        await message.answer("Ви ввели неправильний номер кімнати. Зареєструй бронювання ще раз.")
+        await message.answer("Виникла проблема при виборі кімнати. Зареєструй бронювання ще раз.")
         await state.set_state(vynnyky_Bookingreg.vynnyky_booking_name)
-        await bot.send_message(chat_id=message.from_user.id, text="Введіть назву події")
+        await bot.send_message(chat_id=message.from_user.id, text="Введи назву події")
         return
 
     local_tz = pytz.timezone("Europe/Kiev")
@@ -119,7 +119,7 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
                                             VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky", message)
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
-            db = db_booking.Booking_DataBase("db_plast.db").get_all_data(message.from_user.id)
+            db = db_booking.Booking_DataBase("db_plast.db")
             db.add_book_reg(
                 user_id=message.from_user.id,
                 user_name=user_db_obj['user_name'],
