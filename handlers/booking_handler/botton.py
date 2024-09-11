@@ -1,3 +1,4 @@
+import requests
 from aiogram import Router, F, Bot
 from aiogram import types
 from aiogram.client.default import DefaultBotProperties
@@ -12,6 +13,7 @@ from aiogram.fsm.context import FSMContext
 from datetime import datetime
 import keyboards
 import bots
+import calendars
 
 router = Router()
 db = Booking_DataBase("db_plast.db")
@@ -59,7 +61,15 @@ async def delete_booking(callback_query: CallbackQuery):
     print(booking_info)
 
     db.delete_booking(user_id, booking_code)
+    domivka = db.get_domivka(booking_code)
 
+    print(f"Код бронювання: {booking_code}, Домівка: {domivka}") 
+    if (domivka == "Cтаниця"):
+        await delete_teamup_event(calendars.STANYTSIA_TEAMUP_CALENDAR_ID, booking_code, calendars.STANYTSIA_TEAMUP_API_KEY)
+    elif (domivka == "Винники"):
+        await delete_teamup_event(calendars.VYNNYKY_TEAMUP_CALENDAR_ID, booking_code, calendars.VYNNYKY_TEAMUP_API_KEY)
+
+    db.delete_booking(user_id, booking_code)
     await callback_query.message.delete()
     if callback_query.message.chat.id == -1002421947656:
         await bot.send_message(chat_id=-1002421947656,
@@ -72,8 +82,18 @@ async def delete_booking(callback_query: CallbackQuery):
                                text=f'''Скасовано бронювання #{domivka}{booking_code}''')
 
 
+async def delete_teamup_event(calendar_id, event_id, api_key):
+    url = f"https://api.teamup.com/{calendar_id}/events/{event_id}"
+    headers = {
+        "Teamup-Token": api_key,
+    }
 
+    print(f"Видалення події: {url}")  
 
+    response = requests.delete(url, headers=headers)
+
+    print(f"Статус відповіді: {response.status_code}, Тіло відповіді: {response.text}") 
+    
 @router.message(F.text.lower() == 'повернутись до меню')
 async def return_to_main(message: types.Message):
     await message.answer("Обери розділ", reply_markup=keyboards.mainkb)
