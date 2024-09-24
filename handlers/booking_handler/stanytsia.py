@@ -60,12 +60,17 @@ async def reg_stanytsia_three(callback: CallbackQuery, state: FSMContext):
 
 @router.message(Stanytsia_Bookingreg.stanytsia_day)
 async def reg_stanytsia_four(message: Message, state: FSMContext):
-    date_pattern = r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$"
+    date_pattern = r"^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$"
+    
     if not re.match(date_pattern, message.text):
         await message.answer(
-            "Неправильний формат дати. Будь ласка, введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
+            "Неправильний формат дати. Будь ласка, введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
         return
-    await state.update_data(stanytsia_day=message.text)
+   
+    day, month, year = message.text.split('-')
+    formatted_date = f"{year}-{month}-{day}"
+    
+    await state.update_data(stanytsia_day=formatted_date)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_start_time)
     await message.answer("Введи час початку у форматі ГГ:ХХ. \n ⏰Наприклад 15:00")
 
