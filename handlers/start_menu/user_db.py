@@ -12,7 +12,6 @@ class User(Base):
     user_surname = Column(String)
     user_age = Column(String)
     user_phone = Column(String)
-    user_email = Column(String)
 
 
 class DataBase:
@@ -22,14 +21,13 @@ class DataBase:
         session = sessionmaker(bind=self.engine)
         self.session = session()
 
-    def add_user(self, user_id, user_nickname, user_name, user_surname, user_age, user_phone, user_email):
+    def add_user(self, user_id, user_nickname, user_name, user_surname, user_age, user_phone):
         new_user = User(user_id=user_id,
                         user_nickname=user_nickname,
                         user_name=user_name,
                         user_surname=user_surname,
                         user_age=user_age,
-                        user_phone=user_phone,
-                        user_email=user_email)
+                        user_phone=user_phone)
 
         self.session.add(new_user)
         self.session.commit()
@@ -48,8 +46,7 @@ class DataBase:
                 'user_name': user.user_name,
                 'user_surname': user.user_surname,
                 'user_age': user.user_age,
-                'user_phone': user.user_phone,
-                'user_email': user.user_email
+                'user_phone': user.user_phone
             }
         return None
 

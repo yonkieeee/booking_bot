@@ -20,3 +20,10 @@ phone_kb = ReplyKeyboardMarkup(keyboard=[
     resize_keyboard=True,
     one_time_keyboard=True
 )
+
+agree_button = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Погоджуюсь')]
+],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)

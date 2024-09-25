@@ -41,13 +41,20 @@ async def start(message: Message, state: FSMContext):
 
 @router.message(F.text == 'Зареєструватись')
 async def start_of_reg(message: Message, state: FSMContext):
+    await message.answer("Перед початком реєстрації мені потрібна твоя згода про обробку персональних данних",
+                         reply_markup=kb.agree_button)
+
+
+@router.message(F.text == 'Зареєструватись')
+async def start_of_reg(message: Message, state: FSMContext):
     await message.answer("Введи своє ім'я")
     await state.set_state(registrate_user.user_name)
 
 
 @router.message(F.text == 'Заповнити заново')
 async def start_of_reg(message: Message, state: FSMContext):
-    db.user_delete(message.from_user.id)
+    #db.user_delete(message.from_user.id)
+    reg_info.clear()
     await message.answer("Введи своє ім'я")
     await state.set_state(registrate_user.user_name)
 
@@ -86,12 +93,33 @@ async def reg_age(message: Message, state: FSMContext):
 @router.message(registrate_user.user_phone)
 async def reg_phone(message: Message, state: FSMContext):
     reg_info.append(message.contact.phone_number)
-    await message.answer("Введи свою електронну адресу 📧",
-                         reply_markup=ReplyKeyboardRemove())
+
+    name, surname, age, phone = reg_info
+    print(reg_info)
+    if db.user_exists(message.from_user.id):
+        db.user_delete(message.from_user.id)
+
+        db.add_user(user_id=message.from_user.id,
+                    user_nickname=message.from_user.username,
+                    user_name=name,
+                    user_surname=surname,
+                    user_age=age,
+                    user_phone=phone)
+    else:
+        db.add_user(user_id=message.from_user.id,
+                    user_nickname=message.from_user.username,
+                    user_name=name,
+                    user_surname=surname,
+                    user_age=age,
+                    user_phone=phone)
+    reg_info.clear()
+
+    await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
+    await state.clear()
     await state.set_state(registrate_user.user_email)
 
 
-@router.message(registrate_user.user_email)
+'''@router.message(registrate_user.user_email)
 async def reg_email(message: Message, state: FSMContext):
     email_domain = ['@gmail.com', '@ukr.net', '@icloud.com', '@outlook.com']
     if any(domain in message.text for domain in email_domain):
@@ -112,7 +140,7 @@ async def reg_email(message: Message, state: FSMContext):
         await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
         await state.clear()
     else:
-        await message.answer("Помилка. Введи існуючу пошту")
+        await message.answer("Помилка. Введи існуючу пошту")'''
 
 
 # @router.message()
