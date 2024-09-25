@@ -41,7 +41,7 @@ bookingk = InlineKeyboardMarkup(
         # [InlineKeyboardButton(text="Коциловського, 16", callback_data="kotsylovskogo")],
         # [InlineKeyboardButton(text="Котляревського, 17", callback_data="kotlyarevskogo")],
         # [InlineKeyboardButton(text="Житомирська, 12", callback_data="zhytomyrska")],
-        [InlineKeyboardButton(text="Хочу отримати лист-дозвіл на інше приміщення", callback_data="lysty")]
+        # [InlineKeyboardButton(text="Хочу отримати лист-дозвіл на інше приміщення", callback_data="lysty")]
     ]
 
 )

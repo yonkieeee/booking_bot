@@ -59,9 +59,9 @@ async def delete_booking(callback_query: CallbackQuery):
     booking_code, user_id, domivka = booking_info
     print(callback_query.data)
     print(booking_info)
-
+    
     db.delete_booking(user_id, booking_code)
-    domivka = db.get_domivka(booking_code)
+    
 
     print(f"Код бронювання: {booking_code}, Домівка: {domivka}") 
     if (domivka == "Cтаниця"):
