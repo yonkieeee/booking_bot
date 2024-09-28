@@ -9,6 +9,7 @@ from handlers.start_menu import start_keyboard as kb
 import keyboards
 
 router = Router()
+db = DataBase("db_plast.db")
 reg_info = []
 
 
