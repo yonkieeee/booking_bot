@@ -48,7 +48,7 @@ async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
 async def reg_stanytsia_two(message: Message, state: FSMContext):
     await state.update_data(stanytsia_booking_name=message.text)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_number_of_room)
-    await message.answer("Обери номер кімнати", reply_markup=keyboards.room_inline)
+    await message.answer("🚪Обери номер кімнати:", reply_markup=keyboards.room_inline)
 
 
 @router.callback_query(Stanytsia_Bookingreg.stanytsia_number_of_room)
@@ -72,7 +72,7 @@ async def reg_stanytsia_four(message: Message, state: FSMContext):
     
     await state.update_data(stanytsia_day=formatted_date)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_start_time)
-    await message.answer("Введи час початку у форматі ГГ:ХХ. \n ⏰Наприклад 15:00")
+    await message.answer("Введи час початку бронювання у форматі ГГ:ХХ \n ⏰Наприклад 15:00")
 
 
 @router.message(Stanytsia_Bookingreg.stanytsia_start_time)
@@ -83,7 +83,7 @@ async def reg_stanytsia_five(message: Message, state: FSMContext):
         return
     await state.update_data(stanytsia_start_time=message.text)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_end_time)
-    await message.answer("Введи час закінчення у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
+    await message.answer("А тепер напиши час завершення \n ⏰Наприклад 16:00")
 
 
 @router.message(Stanytsia_Bookingreg.stanytsia_end_time)
@@ -141,7 +141,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                 code_of_booking=response['event'].get('id', 'no_code')
             )
             await message.answer(
-                'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
+                'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice\n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
                 parse_mode=ParseMode.HTML)
 
             if user_db_obj['user_nickname'] is None:

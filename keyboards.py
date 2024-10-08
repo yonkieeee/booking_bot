@@ -9,8 +9,8 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 mainkb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Бронювання"),
-            KeyboardButton(text="Глянути всі бронювання")
+            KeyboardButton(text="🔐Забронюй кімнату"),
+            KeyboardButton(text="Покажи календар бронювань📆")
         ],
         [
             KeyboardButton(text='Переглянути профіль')
@@ -18,7 +18,7 @@ mainkb = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
-    input_field_placeholder="Обери розділ",
+    input_field_placeholder="Чим я можу допомогти?",
     selective=True
 )
 

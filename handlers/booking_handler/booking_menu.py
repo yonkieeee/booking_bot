@@ -24,7 +24,7 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 @router.message(F.text.lower() == "бронювання")
 async def booking(message: types.Message):
     await message.reply(
-        'В цьому розділі ти можеш забронювати приміщення. Але перш ніж це зробити ознайомся з <b><a href="https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing"> правилами</a></b>.        \n❗ Натискаючи кнопку <i>"так, погоджуюсь"</i>, ти погоджуєшся з усіма правилами та забов\'язуєшся їх виконувати',
+        "Чудовий вибір! Перш за все, давай ознайомимось із правилами (https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing). Знаю, читати їх буває нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи \"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
         reply_markup=keyboards.approovancebuilder.as_markup(),
         parse_mode=ParseMode.HTML
     )
@@ -32,7 +32,7 @@ async def booking(message: types.Message):
 
 @router.callback_query(F.data == "approoved")
 async def chooselocation(callback: types.CallbackQuery):
-    await callback.message.answer("Обери приміщення:", reply_markup=keyboards.bookingk)
+    await callback.message.answer("🤝Дякую за співпрацю! Тепер обери приміщення:", reply_markup=keyboards.bookingk)
 
 
 @router.callback_query(F.data == "non_approoved")

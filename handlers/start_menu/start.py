@@ -14,7 +14,7 @@ reg_info = []
 
 
 class registrate_user(StatesGroup):
-    user_name = State()
+    user_fullname = State()
     user_surname = State()
     user_age = State()
     user_phone = State()
@@ -45,31 +45,21 @@ async def start_of_reg(message: Message, state: FSMContext):
                          reply_markup=kb.agree_button)
 
 
-@router.message(F.text == 'Зареєструватись')
+@router.message(F.text == 'Погоджуюсь')
 async def start_of_reg(message: Message, state: FSMContext):
-    await message.answer("Введи своє ім'я")
-    await state.set_state(registrate_user.user_name)
+    await message.answer("Введи своє ім'я та прізвище")
+    await state.set_state(registrate_user.user_fullname)
 
 
 @router.message(F.text == 'Заповнити заново')
 async def start_of_reg(message: Message, state: FSMContext):
     #db.user_delete(message.from_user.id)
     reg_info.clear()
-    await message.answer("Введи своє ім'я")
-    await state.set_state(registrate_user.user_name)
+    await message.answer("Введи своє ім'я та прізвище")
+    await state.set_state(registrate_user.user_fullname)
 
 
-@router.message(registrate_user.user_name)
-async def reg_name(message: Message, state: FSMContext):
-    if not bools.find_symbol(message.text):
-        reg_info.append(message.text)
-        await message.answer("Введи своє прізвище")
-        await state.set_state(registrate_user.user_surname)
-    else:
-        await message.answer("fef")
-
-
-@router.message(registrate_user.user_surname)
+@router.message(registrate_user.user_fullname)
 async def reg_surname(message: Message, state: FSMContext):
     if not bools.find_symbol(message.text):
         reg_info.append(message.text)
@@ -94,7 +84,9 @@ async def reg_age(message: Message, state: FSMContext):
 async def reg_phone(message: Message, state: FSMContext):
     reg_info.append(message.contact.phone_number)
 
-    name, surname, age, phone = reg_info
+    fullname, age, phone = reg_info
+    name, surname = str(fullname).split()
+
     print(reg_info)
     if db.user_exists(message.from_user.id):
         db.user_delete(message.from_user.id)
@@ -150,4 +142,4 @@ async def reg_email(message: Message, state: FSMContext):
 
 @router.message(Command("menu"))
 async def start(message: Message):
-    await message.answer("Обери секцію", reply_markup=keyboards.mainkb)
+    await message.answer("Чим я можу допомогти?", reply_markup=keyboards.mainkb)
