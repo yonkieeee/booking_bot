@@ -20,7 +20,7 @@ db = Booking_DataBase("db_plast.db")
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
-@router.message(F.text.lower() == 'глянути всі бронювання')
+@router.message(F.text == 'Мої бронювання✍🏻')
 async def view_bookings(message: types.Message):
     active_bookings = db.get_all_data(message.from_user.id)
     current_time = datetime.now().replace(second=0, microsecond=0)
