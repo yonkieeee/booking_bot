@@ -36,7 +36,9 @@ async def start(message: Message, state: FSMContext):
                              )
 
     else:
-        await message.answer("Обери секцію", reply_markup=keyboards.mainkb)
+        await message.answer("""Чим я можу допомогти?
+
+🔐 Забронюй кімнату / Покажи календар бронювань 📆""", reply_markup=keyboards.mainkb)
 
 
 @router.message(F.text == 'Зареєструватись')

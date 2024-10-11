@@ -10,7 +10,7 @@ mainkb = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="🔐Забронюй кімнату"),
-            KeyboardButton(text="Покажи календар бронювань📆")
+            KeyboardButton(text="Мої бронювання✍🏻")
         ],
         [
             KeyboardButton(text='Переглянути профіль')
