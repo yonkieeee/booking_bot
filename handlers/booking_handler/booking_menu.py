@@ -23,16 +23,10 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 
 @router.message(F.text == "🔐Забронюй кімнату")
 async def booking(message: types.Message):
-    await message.reply(
-        "Чудовий вибір! Перш за все, давай ознайомимось із правилами (https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing). Знаю, читати їх буває нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи \"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
-        reply_markup=keyboards.approovancebuilder.as_markup(),
-        parse_mode=ParseMode.HTML
-    )
-
-
-@router.callback_query(F.data == "approoved")
-async def chooselocation(callback: types.CallbackQuery):
-    await callback.message.answer("🤝Дякую за співпрацю! Тепер обери приміщення:", reply_markup=keyboards.bookingk)
+    await message.reply("Обери приміщення:",
+                        reply_markup=keyboards.bookingk,
+                        parse_mode=ParseMode.HTML
+                        )
 
 
 @router.callback_query(F.data == "non_approoved")
@@ -85,10 +79,10 @@ async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_
     url = f"https://api.teamup.com/{TEAMUP_CALENDAR_ID}/events"
     headers = {"Teamup-Token": TEAMUP_API_KEY, "Content-Type": "application/json"}
     user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
-
+    print(data)
     event_data = {
         "subcalendar_ids": [data[domivka + "_" + "number_of_room"]],
-        "title": data[domivka + "_" + "booking_name"],
+        "title": f"{user_db_obj['user_name']} {user_db_obj['user_surname']}",
         "start_dt": start_dt,
         "end_dt": end_dt,
         "who": user_db_obj['user_name'] + " " + user_db_obj['user_surname']

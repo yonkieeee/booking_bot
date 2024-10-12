@@ -25,23 +25,29 @@ mainkb = ReplyKeyboardMarkup(
 ##############################################################
 #                       bokingkeyboards                      #
 
-approovancebuilder = InlineKeyboardBuilder()
-approovancebuilder.add(
-    InlineKeyboardButton(text="Так, погоджуюсь", callback_data="approoved"),
-    InlineKeyboardButton(text="Ні", callback_data="non_approoved")
+approovancebuilder = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Погоджуюсь із правилами", callback_data="approoved"),
+            InlineKeyboardButton(text="Не погоджуюсь", callback_data="non_approoved")
+        ]
+    ]
+)
+
+approovancebuilder_v = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Погоджуюсь із правилами", callback_data="approoved_v"),
+            InlineKeyboardButton(text="Не погоджуюсь", callback_data="non_approoved")
+        ]
+    ]
 )
 
 bookingk = InlineKeyboardMarkup(
     inline_keyboard=
     [
         [InlineKeyboardButton(text="Шептицьких, 16", callback_data="stanytsia")],
-        [InlineKeyboardButton(text="Вишкільний центр у Винниках", callback_data="vynnyky")],
-        # [InlineKeyboardButton(text="Хоткевича, 16А", callback_data="khotkevycha")],
-        # [InlineKeyboardButton(text="Тютюнників, 25", callback_data="tyutyunnykiv")],
-        # [InlineKeyboardButton(text="Коциловського, 16", callback_data="kotsylovskogo")],
-        # [InlineKeyboardButton(text="Котляревського, 17", callback_data="kotlyarevskogo")],
-        # [InlineKeyboardButton(text="Житомирська, 12", callback_data="zhytomyrska")],
-        # [InlineKeyboardButton(text="Хочу отримати лист-дозвіл на інше приміщення", callback_data="lysty")]
+        [InlineKeyboardButton(text="Вишкільний центр у Винниках", callback_data="vynnyky")]
     ]
 
 )

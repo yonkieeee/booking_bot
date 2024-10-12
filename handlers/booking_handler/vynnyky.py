@@ -24,7 +24,6 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 
 
 class vynnyky_Bookingreg(StatesGroup):
-    vynnyky_booking_name = State()
     vynnyky_number_of_room = State()
     vynnyky_day = State()
     vynnyky_start_time = State()
@@ -32,50 +31,59 @@ class vynnyky_Bookingreg(StatesGroup):
 
 
 @router.callback_query(F.data == "vynnyky")
-async def bookvynnyky(callback: types.CallbackQuery):
-    await callback.message.answer("Перед натисканням на кнопку 'Реєстрація бронювання' переглянь графік 📅",
-                                  reply_markup=keyboards.vynnykykb)
+async def bookstanytsia(callback: types.CallbackQuery):
+    await callback.message.edit_reply_markup()
+    await callback.message.edit_text(
+        "Чудовий вибір! Перш за все, давай ознайомимось із <a "
+        "href='https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing'>правилами</a>. "
+        "Знаю, читати їх буває"
+        "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
+        "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
+        "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
+        reply_markup=keyboards.approovancebuilder_v,
+        parse_mode=ParseMode.HTML)
+
+
+@router.callback_query(F.data == "approoved_v")
+async def bookstanytsia(callback: types.CallbackQuery):
+    await callback.message.edit_reply_markup()
+    await callback.message.edit_text(
+        "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
+        reply_markup=keyboards.vynnykykb, parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "RegistrateBookingVynnyky")
-async def reg_vynnyky_one(callback: types.CallbackQuery, state: FSMContext):
-    print("1 state done")
-    await state.set_state(vynnyky_Bookingreg.vynnyky_booking_name)
-    await bot.send_message(chat_id=callback.from_user.id, text="Введи назву події")
-
-
-@router.message(vynnyky_Bookingreg.vynnyky_booking_name)
-async def reg_vynnyky_two(message: Message, state: FSMContext):
-    await state.update_data(vynnyky_booking_name=message.text)
+async def reg_stanytsia_two(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.message.edit_reply_markup()
     await state.set_state(vynnyky_Bookingreg.vynnyky_number_of_room)
-    await message.answer("Обери номер кімнати", reply_markup=keyboards.vynnyky_room_inline)
+    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.vynnyky_room_inline)
 
 
 @router.callback_query(vynnyky_Bookingreg.vynnyky_number_of_room)
 async def reg_vynnyky_three(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_reply_markup()
+    await callback.message.delete()
     await state.update_data(vynnyky_number_of_room=callback.data)
     await state.set_state(vynnyky_Bookingreg.vynnyky_day)
-    await callback.message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
+    await callback.message.answer("Введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
 
 
 @router.message(vynnyky_Bookingreg.vynnyky_day)
 async def reg_vynnyky_four(message: Message, state: FSMContext):
     date_pattern = r"^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$"
-    
+
     if not re.match(date_pattern, message.text):
         await message.answer(
             "Неправильний формат дати. Будь ласка, введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
         return
-    
 
     day, month, year = message.text.split('-')
     formatted_date = f"{year}-{month}-{day}"
-    
+
     await state.update_data(vynnyky_day=formatted_date)
-    
+
     await state.set_state(vynnyky_Bookingreg.vynnyky_start_time)
     await message.answer("Введи час початку у форматі ГГ:ХХ. \n ⏰Наприклад 15:00")
-
 
 
 @router.message(vynnyky_Bookingreg.vynnyky_start_time)
@@ -99,13 +107,14 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
     data = await state.get_data()
 
     vynnyky_room_mapping = {"Кухня": 13281316, "Поверх 1": 13281315, "Поверх 2, кімната 1": 13281315,
-                            "Поверх 2, кімната 2": 13281315, "Поверх 2, кімната 3": 13281315, "Поверх 2, кімната 4": 13281315}
+                            "Поверх 2, кімната 2": 13281315, "Поверх 2, кімната 3": 13281315,
+                            "Поверх 2, кімната 4": 13281315}
     if data["vynnyky_number_of_room"] in vynnyky_room_mapping:
         room = data["vynnyky_number_of_room"]
         data["vynnyky_number_of_room"] = vynnyky_room_mapping[data["vynnyky_number_of_room"]]
     else:
         await message.answer("Виникла проблема при виборі кімнати. Зареєструй бронювання ще раз.")
-        await state.set_state(vynnyky_Bookingreg.vynnyky_booking_name)
+        await state.set_state(vynnyky_Bookingreg.vynnyky_number_of_room)
         await bot.send_message(chat_id=message.from_user.id, text="Введи назву події")
         return
 
@@ -121,25 +130,18 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
                                    VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY):
         await message.answer("На цей час у вибраній кімнаті вже є подія. Вибери інший час.")
         await state.set_state(vynnyky_Bookingreg.vynnyky_day)  # повернення до дати
-        await message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
+        await message.answer("Введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
     else:
         response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(),
                                             VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, "vynnyky", message)
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
-            db = db_booking.Booking_DataBase("db_plast.db")
-            db.add_book_reg(
-                user_id=message.from_user.id,
-                user_name=user_db_obj['user_name'],
-                user_surname=user_db_obj['user_surname'],
-                user_name_of_booking=data["vynnyky_booking_name"],
-                user_domivka="Винники",
-                user_room=room,
-                user_date=data["vynnyky_day"],
-                user_start_time=data["vynnyky_start_time"],
-                user_end_time=data["vynnyky_end_time"],
-                code_of_booking=response['event'].get('id', 'no_code')
-            )
+            db = db_booking.BookingDataBase("db_plast.db")
+            db.add_book_reg(user_id=message.from_user.id, user_name=user_db_obj['user_name'],
+                            user_surname=user_db_obj['user_surname'], user_domivka="Винники", user_room=room,
+                            user_date=data["vynnyky_day"], user_start_time=data["vynnyky_start_time"],
+                            user_end_time=data["vynnyky_end_time"],
+                            code_of_booking=response['event'].get('id', 'no_code'))
             await message.answer(
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
                 parse_mode=ParseMode.HTML)

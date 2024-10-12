@@ -5,7 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, CallbackQuery
-from handlers.booking_handler.db_booking import Booking_DataBase
+from handlers.booking_handler.db_booking import BookingDataBase
 from handlers.booking_handler import botton_kb
 from handlers.start_menu import bools
 from aiogram.fsm.state import StatesGroup, State
@@ -16,7 +16,7 @@ import bots
 import calendars
 
 router = Router()
-db = Booking_DataBase("db_plast.db")
+db = BookingDataBase("db_plast.db")
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
@@ -41,12 +41,10 @@ async def view_bookings(message: types.Message):
     else:
         await message.answer("Актуальні бронювання", reply_markup=botton_kb.return_kb)
         for booking in valid_bookings:
-            count = 0
             cancel = botton_kb.create_cancel_button(message.from_user.id, booking['code'],
                                                     str(booking['domivka'])[0])
             await message.answer(
                 f"""Бронювання #{booking['domivka'][0]}{booking['code']}
-Назва: {booking['name_of_booking']}
 Домівка: {booking['domivka']}
 Кімната: {booking['room']}
 Дата: {booking['date']}
@@ -64,9 +62,9 @@ async def delete_booking(callback_query: CallbackQuery):
     
 
     print(f"Код бронювання: {booking_code}, Домівка: {domivka}") 
-    if (domivka == "Cтаниця"):
+    if (domivka == "C"):
         await delete_teamup_event(calendars.STANYTSIA_TEAMUP_CALENDAR_ID, booking_code, calendars.STANYTSIA_TEAMUP_API_KEY)
-    elif (domivka == "Винники"):
+    elif (domivka == "В"):
         await delete_teamup_event(calendars.VYNNYKY_TEAMUP_CALENDAR_ID, booking_code, calendars.VYNNYKY_TEAMUP_API_KEY)
 
     db.delete_booking(user_id, booking_code)

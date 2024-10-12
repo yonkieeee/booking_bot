@@ -24,7 +24,6 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 
 
 class Stanytsia_Bookingreg(StatesGroup):
-    stanytsia_booking_name = State()
     stanytsia_number_of_room = State()
     stanytsia_day = State()
     stanytsia_start_time = State()
@@ -33,29 +32,41 @@ class Stanytsia_Bookingreg(StatesGroup):
 
 @router.callback_query(F.data == "stanytsia")
 async def bookstanytsia(callback: types.CallbackQuery):
-    await callback.message.answer(
+    await callback.message.edit_reply_markup()
+    await callback.message.edit_text(
+        "Чудовий вибір! Перш за все, давай ознайомимось із <a "
+        "href='https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing'>правилами</a>. "
+        "Знаю, читати їх буває"
+        "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
+        "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
+        "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
+        reply_markup=keyboards.approovancebuilder,
+        parse_mode=ParseMode.HTML)
+
+
+
+@router.callback_query(F.data == "approoved")
+async def bookstanytsia(callback: types.CallbackQuery):
+    await callback.message.edit_reply_markup()
+    await callback.message.edit_text(
         "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
         reply_markup=keyboards.stanytsiakb, parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "RegistrateBookingStanytsia")
-async def reg_stanytsia_one(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Stanytsia_Bookingreg.stanytsia_booking_name)
-    await bot.send_message(chat_id=callback.from_user.id, text="Введи назву події")
-
-
-@router.message(Stanytsia_Bookingreg.stanytsia_booking_name)
-async def reg_stanytsia_two(message: Message, state: FSMContext):
-    await state.update_data(stanytsia_booking_name=message.text)
+async def reg_stanytsia_two(callback_query: CallbackQuery, state: FSMContext):
+    await callback_query.message.edit_reply_markup()
     await state.set_state(Stanytsia_Bookingreg.stanytsia_number_of_room)
-    await message.answer("🚪Обери номер кімнати:", reply_markup=keyboards.room_inline)
+    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.room_inline)
 
 
 @router.callback_query(Stanytsia_Bookingreg.stanytsia_number_of_room)
 async def reg_stanytsia_three(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_reply_markup()
+    await callback.message.delete()
     await state.update_data(stanytsia_number_of_room=callback.data)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_day)
-    await callback.message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
+    await callback.message.answer("Введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
 
 
 @router.message(Stanytsia_Bookingreg.stanytsia_day)
@@ -127,22 +138,16 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
 
-            db = db_booking.Booking_DataBase("db_plast.db")
-            db.add_book_reg(
-                user_id=message.from_user.id,
-                user_name=user_db_obj['user_name'],
-                user_surname=user_db_obj['user_surname'],
-                user_name_of_booking=data["stanytsia_booking_name"],
-                user_domivka="Cтаниця",
-                user_room=room,
-                user_date=data["stanytsia_day"],
-                user_start_time=data["stanytsia_start_time"],
-                user_end_time=data["stanytsia_end_time"],
-                code_of_booking=response['event'].get('id', 'no_code')
-            )
+            db = db_booking.BookingDataBase("db_plast.db")
+            db.add_book_reg(user_id=message.from_user.id, user_name=user_db_obj['user_name'],
+                            user_surname=user_db_obj['user_surname'], user_domivka="Cтаниця", user_room=room,
+                            user_date=data["stanytsia_day"], user_start_time=data["stanytsia_start_time"],
+                            user_end_time=data["stanytsia_end_time"],
+                            code_of_booking=response['event'].get('id', 'no_code'))
             await message.answer(
-                'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice\n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
+                '🙌🏻 Неймовірно! Твоє бронювання бронювання підтверджено. Тепер його можна знайти у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. \n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
                 parse_mode=ParseMode.HTML)
+            await state.clear()
 
             if user_db_obj['user_nickname'] is None:
                 nickname_text = ''
@@ -164,5 +169,5 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         else:
             await message.answer(
                 "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
+            await state.clear()
 
-        await state.clear()
