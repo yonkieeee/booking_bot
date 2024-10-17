@@ -10,6 +10,8 @@ RUN pip install requests
 
 RUN pip install pytz
 
+RUN pip install textblob
+
 COPY . .
 
 COPY ./db_plast.db /app/db_plast.db

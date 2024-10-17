@@ -31,6 +31,8 @@ async def booking(message: types.Message):
 
 @router.callback_query(F.data == "non_approoved")
 async def chooselocation(callback: types.CallbackQuery):
+    await callback.message.edit_reply_markup()
+    await callback.message.delete()
     await callback.message.answer("Тоді обери інший пункт меню", reply_markup=keyboards.mainkb)
 
 

@@ -56,7 +56,7 @@ stanytsiakb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingStanytsia"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/ksvs3bv65cgver4o6q")
         ]
     ]
 )

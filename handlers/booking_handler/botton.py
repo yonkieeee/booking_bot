@@ -37,7 +37,7 @@ async def view_bookings(message: types.Message):
             db.delete_booking(message.from_user.id, booking['code'])
 
     if not valid_bookings:
-        await message.answer("Не має активних бронювань")
+        await message.answer("Не має активних бронювань", reply_markup=keyboards.mainkb)
     else:
         await message.answer("Актуальні бронювання", reply_markup=botton_kb.return_kb)
         for booking in valid_bookings:

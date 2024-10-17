@@ -21,6 +21,7 @@ from handlers.booking_handler.botton_kb import create_cancel_button
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+aprooved = []
 
 
 class Stanytsia_Bookingreg(StatesGroup):
@@ -32,21 +33,27 @@ class Stanytsia_Bookingreg(StatesGroup):
 
 @router.callback_query(F.data == "stanytsia")
 async def bookstanytsia(callback: types.CallbackQuery):
-    await callback.message.edit_reply_markup()
-    await callback.message.edit_text(
-        "Чудовий вибір! Перш за все, давай ознайомимось із <a "
-        "href='https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing'>правилами</a>. "
-        "Знаю, читати їх буває"
-        "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
-        "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
-        "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
-        reply_markup=keyboards.approovancebuilder,
-        parse_mode=ParseMode.HTML)
-
+    if len(aprooved) < 1:
+        await callback.message.edit_reply_markup()
+        await callback.message.edit_text(
+            "Чудовий вибір! Перш за все, давай ознайомимось із <a "
+            "href='https://docs.google.com/document/d/1Wj5SvHRSfrgAw7oWq68VOVH5hjNeQOGsNqTaai1v-dg/edit?usp=drivesdk'>правилами</a>. "
+            "Знаю, читати їх буває "
+            "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
+            "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
+            "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
+            reply_markup=keyboards.approovancebuilder,
+            parse_mode=ParseMode.HTML)
+    else:
+        await callback.message.edit_reply_markup()
+        await callback.message.edit_text(
+            "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
+            reply_markup=keyboards.stanytsiakb, parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "approoved")
 async def bookstanytsia(callback: types.CallbackQuery):
+    aprooved.append(1)
     await callback.message.edit_reply_markup()
     await callback.message.edit_text(
         "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
@@ -72,15 +79,15 @@ async def reg_stanytsia_three(callback: CallbackQuery, state: FSMContext):
 @router.message(Stanytsia_Bookingreg.stanytsia_day)
 async def reg_stanytsia_four(message: Message, state: FSMContext):
     date_pattern = r"^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$"
-    
+
     if not re.match(date_pattern, message.text):
         await message.answer(
             "Неправильний формат дати. Будь ласка, введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
         return
-   
+
     day, month, year = message.text.split('-')
     formatted_date = f"{year}-{month}-{day}"
-    
+
     await state.update_data(stanytsia_day=formatted_date)
     await state.set_state(Stanytsia_Bookingreg.stanytsia_start_time)
     await message.answer("Введи час початку бронювання у форматі ГГ:ХХ \n ⏰Наприклад 15:00")
@@ -112,8 +119,6 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         data["stanytsia_number_of_room"] = room_mapping[data["stanytsia_number_of_room"]]
     else:
         await message.answer("Виникла проблема при виборі кімнати. Зареєструй бронювання ще раз.")
-        await state.set_state(Stanytsia_Bookingreg.stanytsia_booking_name)
-        await bot.send_message(chat_id=message.from_user.id, text="Введи назву події")
         return
 
     local_tz = pytz.timezone("Europe/Kiev")
@@ -146,7 +151,8 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                             code_of_booking=response['event'].get('id', 'no_code'))
             await message.answer(
                 '🙌🏻 Неймовірно! Твоє бронювання бронювання підтверджено. Тепер його можна знайти у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. \n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+            reply_markup=keyboards.mainkb)
             await state.clear()
 
             if user_db_obj['user_nickname'] is None:
@@ -168,6 +174,6 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
 
         else:
             await message.answer(
-                "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.")
+                "Сталася помилка при додаванні події.☹️ Спробуйте ще раз або зверніться до офісу Пласту @lvivplastoffice.",
+            reply_markup=keyboards.mainkb)
             await state.clear()
-

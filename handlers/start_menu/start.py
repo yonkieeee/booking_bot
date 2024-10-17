@@ -10,6 +10,7 @@ import keyboards
 
 router = Router()
 db = DataBase("db_plast.db")
+
 reg_info = []
 
 
@@ -23,39 +24,28 @@ class registrate_user(StatesGroup):
 
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
+    user_info = db.get_user(message.from_user.id)
     if not db.user_exists(message.from_user.id):
-        await message.answer('''Привіт 👋, я бот для бронювань приміщень Пласту у Львові!" 
-З моєю допомогою ти зможеш: 
-    📍 Забронювати приміщення в пластовій домівці 
-    📍 Воно одразу з'явиться в календарі бронювання 
-    📍 Тобі не потрібно чекати на відповідь адміна 
-    📍 Зможеш обрати зручний час та зробити бронювання самостійно  
-    📍Є можливість перегляду активних бронювань та скасувати їх за потреби 
-Якщо ти хочеш скористатись ботом, тобі необхідно зареєструватись. Так нам буде простіше співпрацювати далі🤝''',
-                             reply_markup=kb.start_reg
+        await message.answer('''СКОБ! Привіт! Давай знайомитись :)
+ 
+🤖 Я чат-бот станиці Львів. Вмію бронювати кімнати, а ще допоможу тобі знайти відповіді на всілякі запитання стосовно наших приміщень 🏠
+
+✅  Аби я міг бронювати кімнати на твоє ім’я спочатку мені необхідно тебе зареєструвати. Для цього дай згоду на обробку персональних даних 👤''',
+                             reply_markup=kb.agree_button
                              )
-
     else:
-        await message.answer("""Чим я можу допомогти?
-
-🔐 Забронюй кімнату / Покажи календар бронювань 📆""", reply_markup=keyboards.mainkb)
-
-
-@router.message(F.text == 'Зареєструватись')
-async def start_of_reg(message: Message, state: FSMContext):
-    await message.answer("Перед початком реєстрації мені потрібна твоя згода про обробку персональних данних",
-                         reply_markup=kb.agree_button)
+        await state.clear()
+        await message.answer("""Чим я можу допомогти?""", reply_markup=keyboards.mainkb)
 
 
 @router.message(F.text == 'Погоджуюсь')
 async def start_of_reg(message: Message, state: FSMContext):
-    await message.answer("Введи своє ім'я та прізвище")
+    await message.answer("Тепер введи своє ім’я та прізвище")
     await state.set_state(registrate_user.user_fullname)
 
 
 @router.message(F.text == 'Заповнити заново')
 async def start_of_reg(message: Message, state: FSMContext):
-    #db.user_delete(message.from_user.id)
     reg_info.clear()
     await message.answer("Введи своє ім'я та прізвище")
     await state.set_state(registrate_user.user_fullname)
@@ -63,12 +53,12 @@ async def start_of_reg(message: Message, state: FSMContext):
 
 @router.message(registrate_user.user_fullname)
 async def reg_surname(message: Message, state: FSMContext):
-    if not bools.find_symbol(message.text):
+    if bools.check_fullname(message.text):
         reg_info.append(message.text)
-        await message.answer("Введи свою дату народження(DD.MM.YYYY)")
+        await message.answer("Дату народження у форматі ДД.MM.РРРР\n📆 Наприклад: 30.12.2001")
         await state.set_state(registrate_user.user_age)
     else:
-        await message.answer("fef")
+        await message.answer("Ти ввів не правильно своє ім'я та прізвище. Спробуй ще раз")
 
 
 @router.message(registrate_user.user_age)
@@ -79,7 +69,7 @@ async def reg_age(message: Message, state: FSMContext):
                              reply_markup=kb.phone_kb)
         await state.set_state(registrate_user.user_phone)
     else:
-        await message.answer("fef")
+        await message.answer("Ти ввів не правильно свою дату народження. Спробуй ще раз")
 
 
 @router.message(registrate_user.user_phone)
@@ -107,7 +97,8 @@ async def reg_phone(message: Message, state: FSMContext):
                     user_age=age,
                     user_phone=phone)
     reg_info.clear()
-
+    if message.from_user.username == "naza_rko":
+        await message.answer("Здаров чушпан")
     await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
     await state.clear()
     await state.set_state(registrate_user.user_email)

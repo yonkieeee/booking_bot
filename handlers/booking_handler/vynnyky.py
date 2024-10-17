@@ -21,6 +21,7 @@ from handlers.booking_handler.botton_kb import create_cancel_button
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+approved = []
 
 
 class vynnyky_Bookingreg(StatesGroup):
@@ -32,20 +33,27 @@ class vynnyky_Bookingreg(StatesGroup):
 
 @router.callback_query(F.data == "vynnyky")
 async def bookstanytsia(callback: types.CallbackQuery):
-    await callback.message.edit_reply_markup()
-    await callback.message.edit_text(
-        "Чудовий вибір! Перш за все, давай ознайомимось із <a "
-        "href='https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing'>правилами</a>. "
-        "Знаю, читати їх буває"
-        "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
-        "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
-        "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
-        reply_markup=keyboards.approovancebuilder_v,
-        parse_mode=ParseMode.HTML)
+    if len(approved) < 1:
+        await callback.message.edit_reply_markup()
+        await callback.message.edit_text(
+            "Чудовий вибір! Перш за все, давай ознайомимось із <a "
+            "href='https://drive.google.com/file/d/1GIXwD2PadsRAc2wC5RRb4M4bMLBE7jyf/view?usp=sharing'>правилами</a>. "
+            "Знаю, читати їх буває"
+            "нудно, але часто завдяки правилам можна дізнатись надзвичайно важливу інформацію, а також уникнути зайвих "
+            "непорозумінь. Тож не лінуйся, прочитай — підніми настрій нашому офіс-менеджеру 👷🏻‍♂️❗️Натискаючи "
+            "\"Погоджуюсь із правилами\", ти підтверджуєш своє ознайомлення і обіцяєш чемно їх виконувати 🫡",
+            reply_markup=keyboards.approovancebuilder_v,
+            parse_mode=ParseMode.HTML)
+    else:
+        await callback.message.edit_reply_markup()
+        await callback.message.edit_text(
+            "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
+            reply_markup=keyboards.vynnykykb, parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "approoved_v")
 async def bookstanytsia(callback: types.CallbackQuery):
+    approved.append(1)
     await callback.message.edit_reply_markup()
     await callback.message.edit_text(
         "Перед натисканням на кнопку <b>'Реєстрація бронювання'</b> переглянь <b>календар бронювань</b> для перевірки, чи є вільним приміщення в потрібний тобі час📅",
@@ -144,7 +152,8 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
                             code_of_booking=response['event'].get('id', 'no_code'))
             await message.answer(
                 'Твоє бронювання бронювання заповнено.🥳 Ти можеш переглянути його у <i><a href="https://teamup.com/kstbv5srw3gter52zv">календарі</a></i>. Якщо виникли проблеми, то звертайся до офісу пласту @lvivplastoffice',
-                parse_mode=ParseMode.HTML)
+                parse_mode=ParseMode.HTML,
+                reply_markup=keyboards.mainkb)
             if user_db_obj['user_nickname'] is None:
                 nickname_text = ''
             else:
