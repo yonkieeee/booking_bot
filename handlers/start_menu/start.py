@@ -22,7 +22,7 @@ class registrate_user(StatesGroup):
     user_email = State()
 
 
-@router.message(CommandStart())
+@router.message(CommandStart() or Command("menu"))
 async def start(message: Message, state: FSMContext):
     user_info = db.get_user(message.from_user.id)
     if not db.user_exists(message.from_user.id):
@@ -97,8 +97,10 @@ async def reg_phone(message: Message, state: FSMContext):
                     user_age=age,
                     user_phone=phone)
     reg_info.clear()
-    if message.from_user.username == "naza_rko":
+    if message.from_user.id == "719886646":
         await message.answer("Здаров чушпан")
+        await message.answer_photo("https://t.me/c/1544453874/47740")
+
     await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
     await state.clear()
     await state.set_state(registrate_user.user_email)
@@ -133,6 +135,3 @@ async def reg_email(message: Message, state: FSMContext):
 #     await message.answer("Не розумію тебе")
 
 
-@router.message(Command("menu"))
-async def start(message: Message):
-    await message.answer("Чим я можу допомогти?", reply_markup=keyboards.mainkb)
