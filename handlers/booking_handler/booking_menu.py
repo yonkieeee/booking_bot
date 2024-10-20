@@ -87,7 +87,7 @@ async def add_calendar_event(data, start_dt, end_dt, TEAMUP_CALENDAR_ID, TEAMUP_
         "title": f"{user_db_obj['user_name']} {user_db_obj['user_surname']}",
         "start_dt": start_dt,
         "end_dt": end_dt,
-        "who": user_db_obj['user_name'] + " " + user_db_obj['user_surname']
+        # "who": user_db_obj['user_name'] + " " + user_db_obj['user_surname']
     }
     print("Sending Event Data:", event_data)  # Debugging print to verify event data before sending
     response = requests.post(url, headers=headers, json=event_data)

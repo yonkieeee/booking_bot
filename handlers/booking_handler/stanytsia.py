@@ -18,6 +18,7 @@ from . import db_booking
 from .booking_menu import fetch_calendar_events, add_calendar_event, check_event_conflicts
 from handlers.start_menu import user_db
 from handlers.booking_handler.botton_kb import create_cancel_button
+from calendars import get_subcalendars
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -64,7 +65,7 @@ async def bookstanytsia(callback: types.CallbackQuery):
 async def reg_stanytsia_two(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.edit_reply_markup()
     await state.set_state(Stanytsia_Bookingreg.stanytsia_number_of_room)
-    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.room_inline)
+    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.stanytsia_rooms_builder.as_markup())
 
 
 @router.callback_query(Stanytsia_Bookingreg.stanytsia_number_of_room)
@@ -113,7 +114,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
     await state.update_data(stanytsia_end_time=message.text)
     data = await state.get_data()
 
-    room_mapping = {"303": 13281316, "201": 13281315, "206": 13281315, "208": 13281315}
+    room_mapping = get_subcalendars(STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY)
     if data["stanytsia_number_of_room"] in room_mapping:
         room = data["stanytsia_number_of_room"]
         data["stanytsia_number_of_room"] = room_mapping[data["stanytsia_number_of_room"]]

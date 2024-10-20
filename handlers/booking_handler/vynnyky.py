@@ -18,6 +18,7 @@ from . import db_booking
 from .booking_menu import fetch_calendar_events, add_calendar_event, check_event_conflicts
 from handlers.start_menu import user_db
 from handlers.booking_handler.botton_kb import create_cancel_button
+from calendars import get_subcalendars
 
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
@@ -64,7 +65,7 @@ async def bookstanytsia(callback: types.CallbackQuery):
 async def reg_stanytsia_two(callback_query: CallbackQuery, state: FSMContext):
     await callback_query.message.edit_reply_markup()
     await state.set_state(vynnyky_Bookingreg.vynnyky_number_of_room)
-    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.vynnyky_room_inline)
+    await callback_query.message.edit_text("🚪Обери номер кімнати:", reply_markup=keyboards.vynnyky_rooms_builder.as_markup())
 
 
 @router.callback_query(vynnyky_Bookingreg.vynnyky_number_of_room)
@@ -114,9 +115,7 @@ async def reg_vynnyky_six(message: Message, state: FSMContext):
     await state.update_data(vynnyky_end_time=message.text)
     data = await state.get_data()
 
-    vynnyky_room_mapping = {"Кухня": 13281316, "Поверх 1": 13281315, "Поверх 2, кімната 1": 13281315,
-                            "Поверх 2, кімната 2": 13281315, "Поверх 2, кімната 3": 13281315,
-                            "Поверх 2, кімната 4": 13281315}
+    vynnyky_room_mapping = get_subcalendars(VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY)
     if data["vynnyky_number_of_room"] in vynnyky_room_mapping:
         room = data["vynnyky_number_of_room"]
         data["vynnyky_number_of_room"] = vynnyky_room_mapping[data["vynnyky_number_of_room"]]
