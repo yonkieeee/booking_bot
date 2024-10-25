@@ -130,8 +130,8 @@ async def reg_email(message: Message, state: FSMContext):
         await message.answer("Помилка. Введи існуючу пошту")'''
 
 
-# @router.message()
-# async def trash(message: Message):
-#     await message.answer("Не розумію тебе")
+@router.message(F.text == "Хто розробник цього лайна?")
+async def trash(message: Message):
+    await message.answer("@naza_rko")
 
 
