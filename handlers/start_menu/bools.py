@@ -1,6 +1,6 @@
-from langdetect import detect, DetectorFactory
+from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
-
+from datetime import datetime
 
 def find_symbol(s: str) -> bool:
     symbol = set('.,!@#$%^*()_+\'+=`~;"?/<>?\\/')
@@ -17,7 +17,7 @@ def check_fullname(full_name: str) -> bool:
                 lang = detect(i)
 
                 print(i, lang)
-                if lang not in ['uk', 'ru']:
+                if lang not in ['uk', 'ru', 'bg']:
                     return False
                 else:
                     count += 1
@@ -38,7 +38,20 @@ def check_age_num(s: str) -> bool:
         month = s[3:5]
         year = s[6:10]
 
+        print(day, month, year)
+        print(datetime.now().year)
+
         if day.isdigit() and month.isdigit() and year.isdigit():
-            return True
+
+            if year == "1488":
+                return False
+
+            if 1 <= int(day) <= 31 and 1 <= int(month) <= 12 and int(datetime.now().year) >= int(year):
+                try:
+                    datetime(int(year), int(month), int(day))
+                    return True
+                except ValueError:
+                    return False
+
 
     return False

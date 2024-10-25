@@ -23,9 +23,9 @@ async def check_profile(message: types.Message):
     else:
         nickname_text = f'\nНікнейм: {info['user_nickname']}'
 
-    await message.answer(f'''ID: {message.from_user.id}
+    await message.answer(f'''ID: {message.from_user.id}{nickname_text}
 
-Ім'я: {info['user_name']}{nickname_text}
+Ім'я: {info['user_name']}
 Прізвище: {info['user_surname']}
 Рік народження: {info['user_age']}
 Номер телефону: +{info['user_phone']}''', reply_markup=return_kb)
