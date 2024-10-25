@@ -98,6 +98,7 @@ async def reg_phone(message: Message, state: FSMContext):
                     user_phone=phone)
     reg_info.clear()
     if message.from_user.id == "719886646":
+        await message.answer_photo("https://t.me/c/1544453874/41907")
         await message.answer("Здаров чушпан")
         await message.answer_photo("https://t.me/c/1544453874/47740")
 
