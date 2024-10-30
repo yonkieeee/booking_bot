@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import Command, CommandStart, or_f
 from aiogram.types import Message, ReplyKeyboardRemove
 from handlers.start_menu.user_db import DataBase
 from handlers.start_menu import bools
@@ -22,15 +22,17 @@ class registrate_user(StatesGroup):
     user_email = State()
 
 
-@router.message(CommandStart() or Command("menu"))
+@router.message(or_f(CommandStart(), Command("menu")))
 async def start(message: Message, state: FSMContext):
     user_info = db.get_user(message.from_user.id)
     if not db.user_exists(message.from_user.id):
-        await message.answer('''СКОБ! Привіт! Давай знайомитись :)
- 
-🤖 Я чат-бот станиці Львів. Вмію бронювати кімнати, а ще допоможу тобі знайти відповіді на всілякі запитання стосовно наших приміщень 🏠
+        await message.answer('''Привіт! Давай знайомитись :)
 
-✅  Аби я міг бронювати кімнати на твоє ім’я спочатку мені необхідно тебе зареєструвати. Для цього дай згоду на обробку персональних даних 👤''',
+👤 Аби я міг бронювати кімнати на твоє ім’я спочатку мені необхідно тебе зареєструвати
+
+❗️Зверни увагу, що бронювати кімнати можуть лише повнолітні пластуни
+
+✅ Перш ніж розпочати реєстрацію, дай згоду на обробку персональних даних''',
                              reply_markup=kb.agree_button
                              )
     else:

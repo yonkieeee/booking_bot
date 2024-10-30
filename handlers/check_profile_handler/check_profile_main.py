@@ -28,5 +28,5 @@ async def check_profile(message: types.Message):
 Ім'я: {info['user_name']}
 Прізвище: {info['user_surname']}
 Рік народження: {info['user_age']}
-Номер телефону: +{info['user_phone']}''', reply_markup=return_kb)
+Номер телефону: {info['user_phone']}''', reply_markup=return_kb)
 

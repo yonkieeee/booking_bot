@@ -4,6 +4,7 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton
 )
+from aiogram.filters import Command, CommandStart, or_f
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from calendars import get_subcalendars
 from calendars import STANYTSIA_TEAMUP_API_KEY, STANYTSIA_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY, VYNNYKY_TEAMUP_CALENDAR_ID
@@ -57,8 +58,8 @@ bookingk = InlineKeyboardMarkup(
 stanytsiakb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingStanytsia"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/ksvs3bv65cgver4o6q")
+            InlineKeyboardButton(text="Зареєструвати бронювання", callback_data="RegistrateBookingStanytsia"),
+            InlineKeyboardButton(text="Календар бронювань", url="https://teamup.com/ksc98b6pqmbapwt883")
         ]
     ]
 )
@@ -73,58 +74,69 @@ stanytsia_rooms_builder.adjust(2)
 vynnykykb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingVynnyky"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+            InlineKeyboardButton(text="Зареєструвати бронювання", callback_data="RegistrateBookingVynnyky"),
+            InlineKeyboardButton(text="ГКалендар бронювань", url="https://teamup.com/ksnkruqk4d9xezc8r7")
         ]
     ]
 )
 
-vynnyky_rooms_builder = InlineKeyboardBuilder()
-rooms=get_subcalendars(VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY)
-for key in rooms:
-    vynnyky_rooms_builder.button(text=key,callback_data=key)
-vynnyky_rooms_builder.adjust(2)
-
-khotkevychakb = InlineKeyboardMarkup(
+vynnykybooking_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKhotkevycha"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
-        ]
-    ]
-)
-tyutyunnykivkb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingTyutyunnykiv"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
-        ]
-    ]
-)
-kotsylovskogokb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKotsylovskogo"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
-        ]
-    ]
-)
-kotlyarevskogokb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKotlyarevskogo"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+            InlineKeyboardButton(text="Написати на офіс", url="https://t.me/lvivplastoffice")
+           
+            
         ]
     ]
 )
 
-zhytomyrskakb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingStanytsia"),
-            InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
-        ]
-    ]
-)
+
+# vynnyky_rooms_builder = InlineKeyboardBuilder()
+# rooms=get_subcalendars(VYNNYKY_TEAMUP_CALENDAR_ID, VYNNYKY_TEAMUP_API_KEY)
+# for key in rooms:
+#     vynnyky_rooms_builder.button(text=key,callback_data=key)
+# vynnyky_rooms_builder.adjust(2)
+
+# khotkevychakb = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKhotkevycha"),
+#             InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+#         ]
+#     ]
+# )
+# tyutyunnykivkb = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingTyutyunnykiv"),
+#             InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+#         ]
+#     ]
+# )
+# kotsylovskogokb = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKotsylovskogo"),
+#             InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+#         ]
+#     ]
+# )
+# kotlyarevskogokb = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingKotlyarevskogo"),
+#             InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+#         ]
+#     ]
+# )
+
+# zhytomyrskakb = InlineKeyboardMarkup(
+#     inline_keyboard=[
+#         [
+#             InlineKeyboardButton(text="Реєстрація бронювання", callback_data="RegistrateBookingStanytsia"),
+#             InlineKeyboardButton(text="Графік Бронювання", url="https://teamup.com/kstbv5srw3gter52zv")
+#         ]
+#     ]
+# )
 #                       bookingkeyboards                      #
 ###############################################################
