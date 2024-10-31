@@ -16,7 +16,7 @@ class User(Base):
 
 class DataBase:
     def __init__(self, db_file):
-        self.engine = create_engine(f'sqlite:///{db_file}')
+        self.engine = create_engine(f'mysql+pymysql://yv561422_plast:T9%re9As(6@yv561422.mysql.tools:3306/yv561422_plast')
         Base.metadata.create_all(self.engine)
         session = sessionmaker(bind=self.engine)
         self.session = session()
