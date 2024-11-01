@@ -9,19 +9,20 @@ class BookReg(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, nullable=False)
-    name = Column(String)
-    surname = Column(String)
-    domivka = Column(String)
-    room = Column(String)
-    date = Column(String)
-    start_time = Column(String)
-    end_time = Column(String)
-    code = Column(String)#код бронювання який є унікальний для кожного бронювання
+    name = Column(String(50))
+    surname = Column(String(50))
+    domivka = Column(String(50))
+    room = Column(String(50))
+    date = Column(String(50))
+    start_time = Column(String(50))
+    end_time = Column(String(50))
+    code = Column(String(50))  # код бронювання який є унікальний для кожного бронювання
 
 
 class BookingDataBase:
     def __init__(self, db_file):
-        self.engine = create_engine(f'mysql+pymysql://yv561422_plast:T9%re9As(6@yv561422.mysql.tools:3306/yv561422_plast')
+        self.engine = create_engine(
+            f'mysql+pymysql://yv561422_plast1:fD44r~n9*P@yv561422.mysql.tools:3306/yv561422_plast1')
         Base.metadata.create_all(self.engine)
         session = sessionmaker(bind=self.engine)
         self.session = session()
@@ -41,29 +42,31 @@ class BookingDataBase:
         self.session.commit()
 
     def get_all_data(self, user_id):
-        records = self.session.query(BookReg).filter_by(user_id=user_id).all()
+        with sessionmaker(bind=self.engine)() as session:
+            records = session.query(BookReg).filter_by(user_id=user_id).all()
 
-        return [
-            {
-                "domivka": record.domivka,
-                "room": record.room,
-                "date": record.date,
-                "start_time": record.start_time,
-                "end_time": record.end_time,
-                "code": record.code
-             }
-            for record in records
-        ]
+            return [
+                {
+                    "domivka": record.domivka,
+                    "room": record.room,
+                    "date": record.date,
+                    "start_time": record.start_time,
+                    "end_time": record.end_time,
+                    "code": record.code
+                }
+                for record in records
+            ]
 
     def delete_booking(self, id_user, user_code):
         self.session.query(BookReg).filter_by(user_id=id_user, code=user_code).delete()
         self.session.commit()
-        
-    def get_domivka(self, code):
-        record = self.session.query(BookReg).filter_by(code=code).first()
-        if record:
-            return record.domivka
-        else:
-            return None
 
-        
+    def get_domivka(self, code):
+        with sessionmaker(bind=self.engine)() as session:
+            record = session.query(BookReg).filter_by(code=code).first()
+            if record:
+                return record.domivka
+            else:
+                return None
+
+
