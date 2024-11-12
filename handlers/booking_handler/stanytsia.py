@@ -136,7 +136,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                                    end_datetime.isoformat(), STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY):
         await message.answer("На цей час у вибраній кімнаті вже є подія. Вибери інший час.")
         await state.set_state(Stanytsia_Bookingreg.stanytsia_day)  # повернення до дати
-        await message.answer("Введи день у форматі РРРР-ММ-ДД. \n 📆Наприклад: 2024-05-20")
+        await message.answer("Введи день у форматі ДД-ММ-РРРР. \n 📆Наприклад: 20-05-2024")
     else:
         response = await add_calendar_event(data, start_datetime.isoformat(), end_datetime.isoformat(),
                                             STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY, "stanytsia",
