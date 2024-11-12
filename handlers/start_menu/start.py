@@ -59,8 +59,10 @@ async def reg_surname(message: Message, state: FSMContext):
         reg_info.append(message.text)
         await message.answer("Дату народження у форматі ДД.MM.РРРР\n📆 Наприклад: 30.12.2001")
         await state.set_state(registrate_user.user_age)
+    elif str(message.text).split()[0] > 50 or str(message.text).split()[1] > 50:
+        await message.answer("Введено забагато символів. Спробуй ще раз")
     else:
-        await message.answer("Ти ввів не правильно своє ім'я та прізвище. Спробуй ще раз")
+        await message.answer("Введено не правильно ім'я або прізвище. Спробуй ще раз")
 
 
 @router.message(registrate_user.user_age)
