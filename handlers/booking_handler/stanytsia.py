@@ -159,7 +159,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
             if user_db_obj['user_nickname'] is None:
                 nickname_text = ''
             else:
-                nickname_text = f'Нікнейм @{user_db_obj['user_nickname']}'
+                nickname_text = f'Нікнейм @{user_db_obj["user_nickname"]}'
 
             await bot.send_message(chat_id=-1002421947656,
                                    text=f'''Бронювання #С{response['event'].get('id', 'no_code')}

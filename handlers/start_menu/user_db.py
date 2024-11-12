@@ -7,16 +7,16 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, nullable=False)
-    user_nickname = Column(String)
-    user_name = Column(String)
-    user_surname = Column(String)
-    user_age = Column(String)
-    user_phone = Column(String)
+    user_nickname = Column(String(30))
+    user_name = Column(String(15))
+    user_surname = Column(String(30))
+    user_age = Column(String(30))
+    user_phone = Column(String(30))
 
 
 class DataBase:
     def __init__(self, db_file):
-        self.engine = create_engine(f'mysql+pymysql://yv561422_plast:T9%re9As(6@yv561422.mysql.tools:3306/yv561422_plast')
+        self.engine = create_engine(f'mysql+pymysql://plast_admin:zS8m8R92Nf@localhost:3306/plast_db')
         Base.metadata.create_all(self.engine)
         session = sessionmaker(bind=self.engine)
         self.session = session()

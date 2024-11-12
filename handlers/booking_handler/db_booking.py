@@ -9,19 +9,19 @@ class BookReg(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, nullable=False)
-    name = Column(String)
-    surname = Column(String)
-    domivka = Column(String)
-    room = Column(String)
-    date = Column(String)
-    start_time = Column(String)
-    end_time = Column(String)
-    code = Column(String)#код бронювання який є унікальний для кожного бронювання
+    name = Column(String(15))
+    surname = Column(String(20))
+    domivka = Column(String(20))
+    room = Column(String(20))
+    date = Column(String(15))
+    start_time = Column(String(20))
+    end_time = Column(String(20))
+    code = Column(String(20))#код бронювання який є унікальний для кожного бронювання
 
 
 class BookingDataBase:
     def __init__(self, db_file):
-        self.engine = create_engine(f'mysql+pymysql://yv561422_plast:T9%re9As(6@yv561422.mysql.tools:3306/yv561422_plast')
+        self.engine = create_engine(f'mysql+pymysql://plast_admin:zS8m8R92Nf@localhost:3306/plast_db')
         Base.metadata.create_all(self.engine)
         session = sessionmaker(bind=self.engine)
         self.session = session()

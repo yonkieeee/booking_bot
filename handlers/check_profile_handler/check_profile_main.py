@@ -21,7 +21,7 @@ async def check_profile(message: types.Message):
     if info['user_nickname'] is None:
         nickname_text = ''
     else:
-        nickname_text = f'\nНікнейм: {info['user_nickname']}'
+        nickname_text = f'\nНікнейм: {info["user_nickname"]}'
 
     await message.answer(f'''ID: {message.from_user.id}{nickname_text}
 
