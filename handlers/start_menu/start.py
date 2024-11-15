@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart, or_f
 from aiogram.types import Message, ReplyKeyboardRemove
 from handlers.start_menu.user_db import DataBase
@@ -69,7 +70,7 @@ async def reg_surname(message: Message, state: FSMContext):
 async def reg_age(message: Message, state: FSMContext):
     if bools.check_age_num(message.text):
         reg_info.append(message.text)
-        await message.answer("Поділись своїм номером телефону ☎️",
+        await message.answer("Поділись своїм номером телефону(Кнопка нижче) ☎️",
                              reply_markup=kb.phone_kb)
         await state.set_state(registrate_user.user_phone)
     else:
@@ -116,7 +117,7 @@ async def reg_phone(message: Message, state: FSMContext):
 
 
 
-@router.message(F.text == "Хто розробник цього лайна?")
+@router.message(F.text == "Хто  керівник цього лайна ?")
 async def trash(message: Message):
     await message.answer("@naza_rko")
 
@@ -125,4 +126,20 @@ async def trash(message: Message):
 @router.message(F.text == "Курва мач я пердоля")
 async def trash(message: Message):
     await message.answer("Бобр курва, яке бидле")
+
+
+@router.message(F.text == "СКОБ")
+async def skob(message: Message):
+    await message.answer("Сильно. Красно. Обережно. Бистро.")
+
+@router.message(F.text == "SKOB")
+async def skob(message: Message):
+    await message.answer("You think I don`t know english?\nStrong. Beautiful. Carefully. Fast\nSBCF")
+
+@router.message(F.text == "Зачитай реп ")
+async def mc_petya(message: Message):
+    await message.answer("<a href='https://youtu.be/nxSCC-eDpxk?si=DP2p4ryVvXAwBgEl'>Реп</a>"
+                         ,parse_mode=ParseMode.HTML)
+
+
 
