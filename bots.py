@@ -1,3 +1,4 @@
-main_bot = "6607246878:AAHs55yPV7run5MUN7QNuYahjxto9IUToAM"
+main_bot = "7825974748:AAEu-0fqg2KWIHE-hnilsmI81Za3X5_T1CE"
+local_bot = "6607246878:AAHs55yPV7run5MUN7QNuYahjxto9IUToAM"
 yare_test_bot = "7004301340:AAFYNXNivo3kHNDbU1XnXRHYJpa5kpU-RgQ"
 

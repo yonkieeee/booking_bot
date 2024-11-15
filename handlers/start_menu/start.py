@@ -78,65 +78,51 @@ async def reg_age(message: Message, state: FSMContext):
 
 @router.message(registrate_user.user_phone)
 async def reg_phone(message: Message, state: FSMContext):
-    reg_info.append(message.contact.phone_number)
+    if message.contact.phone_number:
+        reg_info.append(message.contact.phone_number)
 
-    fullname, age, phone = reg_info
-    name, surname = str(fullname).split()
+        fullname, age, phone = reg_info
+        name, surname = str(fullname).split()
 
-    print(reg_info)
-    if db.user_exists(message.from_user.id):
-        db.user_delete(message.from_user.id)
+        print(reg_info)
+        if db.user_exists(message.from_user.id):
+            db.user_delete(message.from_user.id)
 
-        db.add_user(user_id=message.from_user.id,
-                    user_nickname=message.from_user.username,
-                    user_name=name,
-                    user_surname=surname,
-                    user_age=age,
-                    user_phone=phone)
-    else:
-        db.add_user(user_id=message.from_user.id,
-                    user_nickname=message.from_user.username,
-                    user_name=name,
-                    user_surname=surname,
-                    user_age=age,
-                    user_phone=phone)
-    reg_info.clear()
-    if message.from_user.id == "719886646":
-        await message.answer_photo("https://t.me/c/1544453874/41907")
-        await message.answer("Здаров чушпан")
-        await message.answer_photo("https://t.me/c/1544453874/47740")
-
-    await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
-    await state.clear()
-    await state.set_state(registrate_user.user_email)
-
-
-'''@router.message(registrate_user.user_email)
-async def reg_email(message: Message, state: FSMContext):
-    email_domain = ['@gmail.com', '@ukr.net', '@icloud.com', '@outlook.com']
-    if any(domain in message.text for domain in email_domain):
-        reg_info.append(message.text)
-
-        name, surname, age, phone, email = reg_info
-
-        db.add_user(user_id=message.from_user.id,
-                    user_nickname=message.from_user.username,
-                    user_name=name,
-                    user_surname=surname,
-                    user_age=age,
-                    user_phone=phone,
-                    user_email=email)
-
+            db.add_user(user_id=message.from_user.id,
+                        user_nickname=message.from_user.username,
+                        user_name=name,
+                        user_surname=surname,
+                        user_age=age,
+                        user_phone=phone)
+        else:
+            db.add_user(user_id=message.from_user.id,
+                        user_nickname=message.from_user.username,
+                        user_name=name,
+                        user_surname=surname,
+                        user_age=age,
+                        user_phone=phone)
         reg_info.clear()
+        if message.from_user.id == "719886646":
+            await message.answer_photo("https://t.me/c/1544453874/41907")
+            await message.answer("Здаров чушпан")
+            await message.answer_photo("https://t.me/c/1544453874/47740")
 
         await message.answer("Реєстрація завершена✔️", reply_markup=keyboards.mainkb)
         await state.clear()
+        await state.set_state(registrate_user.user_email)
     else:
-        await message.answer("Помилка. Введи існуючу пошту")'''
+        await message.answer("Помилка реєстрації номера. Натисни ще раз кнопку", reply_markup=kb.phone_kb)
+
+
 
 
 @router.message(F.text == "Хто розробник цього лайна?")
 async def trash(message: Message):
     await message.answer("@naza_rko")
 
+
+
+@router.message(F.text == "Курва мач я пердоля")
+async def trash(message: Message):
+    await message.answer("Бобр курва, яке бидле")
 

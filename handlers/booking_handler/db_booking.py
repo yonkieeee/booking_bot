@@ -21,7 +21,7 @@ class BookReg(Base):
 
 class BookingDataBase:
     def __init__(self, db_file):
-        self.engine = create_engine(f'mysql+pymysql://plast_admin:zS8m8R92Nf@localhost:3306/plast_db',
+        self.engine = create_engine("postgresql://plast_admin:bs&P71q4to;?@localhost:5432/plast_db",
                                     pool_recycle=3600, pool_pre_ping=True)
         Base.metadata.create_all(self.engine)
 
