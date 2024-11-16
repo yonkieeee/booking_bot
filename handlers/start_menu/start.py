@@ -137,8 +137,9 @@ async def skob(message: Message):
 
 @router.message(F.text == "Зачитай реп ")
 async def mc_petya(message: Message):
-    await message.answer("<a href='https://youtu.be/nxSCC-eDpxk?si=DP2p4ryVvXAwBgEl'>Реп</a>"
-                         ,parse_mode=ParseMode.HTML)
+    await message.answer("<a href='https://youtube.com/shorts/egLK3Y7L4XM?feature=share'>Реп</a>"
+                         ,parse_mode=ParseMode.HTML,
+                         disable_web_page_preview=True)
 
 
 
