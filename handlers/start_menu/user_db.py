@@ -23,11 +23,11 @@ class DataBase:
     def add_user(self, user_id, user_nickname, user_name, user_surname, user_age, user_phone):
         with sessionmaker(bind=self.engine)() as session:
             new_user = User(user_id=str(user_id),
-                            user_nickname=user_nickname,
-                            user_name=user_name,
-                            user_surname=user_surname,
-                            user_age=user_age,
-                            user_phone=user_phone)
+                            user_nickname=str(user_nickname),
+                            user_name=str(user_name),
+                            user_surname=str(user_surname),
+                            user_age=str(user_age),
+                            user_phone=str(user_phone))
 
             session.add(new_user)
             session.commit()
@@ -35,13 +35,13 @@ class DataBase:
 
     def user_exists(self, user_id) -> bool:
         with sessionmaker(bind=self.engine)() as session:
-            result = session.query(User).filter_by(user_id=user_id).first()
+            result = session.query(User).filter_by(user_id=str(user_id)).first()
             session.close()
         return result is not None
 
     def get_user(self, user_id):
         with sessionmaker(bind=self.engine)() as session:
-            user = session.query(User).filter_by(user_id=user_id).first()
+            user = session.query(User).filter_by(user_id=str(user_id)).first()
             session.close()
             if user:
                 return {
@@ -56,6 +56,6 @@ class DataBase:
 
     def user_delete(self, user_id):
         with sessionmaker(bind=self.engine)() as session:
-            session.query(User).filter_by(user_id=user_id).delete()
+            session.query(User).filter_by(user_id=str(user_id)).delete()
             session.commit()
             session.close()

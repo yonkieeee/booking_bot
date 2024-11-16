@@ -29,21 +29,21 @@ class BookingDataBase:
                      user_domivka, user_room, user_date, user_start_time, user_end_time, code_of_booking):
         with sessionmaker(bind=self.engine)() as session:
             new_booking = BookReg(user_id=str(user_id),
-                                  name=user_name,
-                                  surname=user_surname,
-                                  domivka=user_domivka,
-                                  room=user_room,
-                                  date=user_date,
-                                  start_time=user_start_time,
-                                  end_time=user_end_time,
-                                  code=code_of_booking)
+                                  name=str(user_name),
+                                  surname=str(user_surname),
+                                  domivka=str(user_domivka),
+                                  room=str(user_room),
+                                  date=str(user_date),
+                                  start_time=str(user_start_time),
+                                  end_time=str(user_end_time),
+                                  code=str(code_of_booking))
             session.add(new_booking)
             session.commit()
             session.close()
 
     def get_all_data(self, user_id):
         with sessionmaker(bind=self.engine)() as session:
-            records = session.query(BookReg).filter_by(user_id=user_id).all()
+            records = session.query(BookReg).filter_by(user_id=str(user_id)).all()
             session.close()
             return [
                 {
@@ -60,7 +60,7 @@ class BookingDataBase:
 
     def delete_booking(self, id_user, user_code):
         with sessionmaker(bind=self.engine)() as session:
-            session.query(BookReg).filter_by(user_id=str(id_user), code=user_code).delete()
+            session.query(BookReg).filter_by(user_id=str(id_user), code=str(user_code)).delete()
             session.commit()
             session.close()
 

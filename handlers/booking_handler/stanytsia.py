@@ -142,7 +142,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
                                             STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY, "stanytsia",
                                             message)
         if 'event' in response:
-            user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
+            user_db_obj = user_db.DataBase("db_plast.db").get_user(str(message.from_user.id))
 
             db = db_booking.BookingDataBase("db_plast.db")
             db.add_book_reg(user_id=str(message.from_user.id), user_name=user_db_obj['user_name'],
