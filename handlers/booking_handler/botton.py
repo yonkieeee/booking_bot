@@ -22,7 +22,7 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 
 @router.message(F.text == 'Мої бронювання✍🏻')
 async def view_bookings(message: types.Message):
-    active_bookings = db.get_all_data(message.from_user.id)
+    active_bookings = db.get_all_data(str(message.from_user.id))
     current_time = datetime.now().replace(second=0, microsecond=0)
     print(current_time)
     valid_bookings = []
@@ -58,7 +58,7 @@ async def delete_booking(callback_query: CallbackQuery):
     print(callback_query.data)
     print(booking_info)
     
-    db.delete_booking(user_id, booking_code)
+    db.delete_booking(str(user_id), booking_code)
     
 
     print(f"Код бронювання: {booking_code}, Домівка: {domivka}") 
@@ -67,7 +67,7 @@ async def delete_booking(callback_query: CallbackQuery):
     elif (domivka == "В"):
         await delete_teamup_event(calendars.VYNNYKY_TEAMUP_CALENDAR_ID, booking_code, calendars.VYNNYKY_TEAMUP_API_KEY)
 
-    db.delete_booking(user_id, booking_code)
+    db.delete_booking(str(user_id), booking_code)
     await callback_query.message.delete()
     if callback_query.message.chat.id == -1002421947656:
         await bot.send_message(chat_id=-1002421947656,
@@ -75,7 +75,7 @@ async def delete_booking(callback_query: CallbackQuery):
         await bot.send_message(chat_id=user_id, text=f'''Твоє бронювання #{domivka}{booking_code} скасували''' )
     else:
         await callback_query.message.answer(f"Бронювання #{domivka}{booking_code} успішно скасовано.")
-        db.delete_booking(user_id, booking_code)
+        db.delete_booking(str(user_id), booking_code)
         await bot.send_message(chat_id=-1002421947656,
                                text=f'''Скасовано бронювання #{domivka}{booking_code}''')
 

@@ -16,7 +16,7 @@ reg_user = registrate_user()
 
 @router.message(F.text.lower() == 'переглянути профіль')
 async def check_profile(message: types.Message):
-    info = db.get_user(message.from_user.id)
+    info = db.get_user(str(message.from_user.id))
 
     if info['user_nickname'] is None:
         nickname_text = ''
