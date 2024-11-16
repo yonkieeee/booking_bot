@@ -145,7 +145,7 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
             user_db_obj = user_db.DataBase("db_plast.db").get_user(message.from_user.id)
 
             db = db_booking.BookingDataBase("db_plast.db")
-            db.add_book_reg(user_id=message.from_user.id, user_name=user_db_obj['user_name'],
+            db.add_book_reg(user_id=str(message.from_user.id), user_name=user_db_obj['user_name'],
                             user_surname=user_db_obj['user_surname'], user_domivka="Cтаниця", user_room=room,
                             user_date=data["stanytsia_day"], user_start_time=data["stanytsia_start_time"],
                             user_end_time=data["stanytsia_end_time"],

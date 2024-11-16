@@ -22,7 +22,7 @@ class DataBase:
 
     def add_user(self, user_id, user_nickname, user_name, user_surname, user_age, user_phone):
         with sessionmaker(bind=self.engine)() as session:
-            new_user = User(user_id=user_id,
+            new_user = User(user_id=str(user_id),
                             user_nickname=user_nickname,
                             user_name=user_name,
                             user_surname=user_surname,

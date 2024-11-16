@@ -26,7 +26,7 @@ class registrate_user(StatesGroup):
 @router.message(or_f(CommandStart(), Command("menu")))
 async def start(message: Message, state: FSMContext):
     user_info = db.get_user(message.from_user.id)
-    if not db.user_exists(message.from_user.id):
+    if not db.user_exists(str(message.from_user.id)):
         await message.answer('''Привіт! Давай знайомитись :)
 
 👤 Аби я міг бронювати кімнати на твоє ім’я спочатку мені необхідно тебе зареєструвати
@@ -86,17 +86,17 @@ async def reg_phone(message: Message, state: FSMContext):
         name, surname = str(fullname).split()
 
         print(reg_info)
-        if db.user_exists(message.from_user.id):
-            db.user_delete(message.from_user.id)
+        if db.user_exists(str(message.from_user.id)):
+            db.user_delete(str(message.from_user.id))
 
-            db.add_user(user_id=message.from_user.id,
+            db.add_user(user_id=str(message.from_user.id),
                         user_nickname=message.from_user.username,
                         user_name=name,
                         user_surname=surname,
                         user_age=age,
                         user_phone=phone)
         else:
-            db.add_user(user_id=message.from_user.id,
+            db.add_user(user_id=str(message.from_user.id),
                         user_nickname=message.from_user.username,
                         user_name=name,
                         user_surname=surname,

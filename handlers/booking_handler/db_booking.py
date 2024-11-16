@@ -28,7 +28,7 @@ class BookingDataBase:
     def add_book_reg(self, user_id, user_name, user_surname,
                      user_domivka, user_room, user_date, user_start_time, user_end_time, code_of_booking):
         with sessionmaker(bind=self.engine)() as session:
-            new_booking = BookReg(user_id=user_id,
+            new_booking = BookReg(user_id=str(user_id),
                                   name=user_name,
                                   surname=user_surname,
                                   domivka=user_domivka,
