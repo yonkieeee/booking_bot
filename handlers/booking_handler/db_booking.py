@@ -60,13 +60,13 @@ class BookingDataBase:
 
     def delete_booking(self, id_user, user_code):
         with sessionmaker(bind=self.engine)() as session:
-            session.query(BookReg).filter_by(user_id=id_user, code=user_code).delete()
+            session.query(BookReg).filter_by(user_id=str(id_user), code=user_code).delete()
             session.commit()
             session.close()
 
     def get_domivka(self, code):
         with sessionmaker(bind=self.engine)() as session:
-            record = session.query(BookReg).filter_by(code=code).first()
+            record = session.query(BookReg).filter_by(code=str(code)).first()
             session.close()
             if record:
                 return record.domivka
