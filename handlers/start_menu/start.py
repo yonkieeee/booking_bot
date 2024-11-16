@@ -135,7 +135,7 @@ async def skob(message: Message):
 async def skob(message: Message):
     await message.answer("You think I don`t know english?\nStrong. Beautiful. Carefully. Fast\nSBCF")
 
-@router.message(F.text == "Зачитай реп ")
+@router.message(F.text == "Зачитай реп")
 async def mc_petya(message: Message):
     await message.answer("<a href='https://youtu.be/nxSCC-eDpxk?si=DP2p4ryVvXAwBgEl'>Реп</a>"
                          ,parse_mode=ParseMode.HTML)
