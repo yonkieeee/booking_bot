@@ -25,7 +25,6 @@ class registrate_user(StatesGroup):
 
 @router.message(or_f(CommandStart(), Command("menu")))
 async def start(message: Message, state: FSMContext):
-    user_info = db.get_user(message.from_user.id)
     if not db.user_exists(str(message.from_user.id)):
         await message.answer('''Привіт! Давай знайомитись :)
 
