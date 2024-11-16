@@ -2,6 +2,8 @@ from aiogram import Router, F, Bot
 from aiogram import types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
+from aiogram.fsm.context import FSMContext
+
 from handlers.start_menu.user_db import DataBase
 from handlers.start_menu.start import registrate_user
 from handlers.check_profile_handler.check_kb import return_kb
@@ -14,8 +16,10 @@ bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 reg_user = registrate_user()
 
 
-@router.message(F.text.lower() == 'переглянути профіль')
-async def check_profile(message: types.Message):
+@router.message(F.text == 'Переглянути профіль')
+async def check_profile(message: types.Message, state: FSMContext):
+
+    await state.clear()
     info = db.get_user(str(message.from_user.id))
 
     if info['user_nickname'] is None:
