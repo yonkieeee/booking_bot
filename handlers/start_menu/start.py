@@ -79,7 +79,7 @@ async def reg_age(message: Message, state: FSMContext):
 @router.message(registrate_user.user_phone)
 async def reg_phone(message: Message, state: FSMContext):
     if message.contact.phone_number:
-        reg_info.append(message.contact.phone_number)
+        reg_info.append(str(message.contact.phone_number))
 
         fullname, age, phone = reg_info
         name, surname = str(fullname).split()
