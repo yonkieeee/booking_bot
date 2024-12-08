@@ -20,9 +20,11 @@ from handlers.start_menu import user_db
 from handlers.booking_handler.botton_kb import create_cancel_button
 from calendars import get_subcalendars
 
+
 router = Router()
 bot = Bot(bots.main_bot, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 aprooved = []
+db = db_booking.BookingDataBase("db_plast.db")
 
 
 class Stanytsia_Bookingreg(StatesGroup):
@@ -108,11 +110,35 @@ async def reg_stanytsia_five(message: Message, state: FSMContext):
 @router.message(Stanytsia_Bookingreg.stanytsia_end_time)
 async def reg_stanytsia_six(message: Message, state: FSMContext):
     time_pattern = r"^(?:[01]\d|2[0-3]):[0-5]\d$"
+    if len(db.get_all_data(str(message.from_user.id)))>4:
+        await message.answer("""На жаль, поки не можна робити більше ніж 5 бронювань за допомогою бота.
+                              Якщо тобі потрібно більше бронювань, то напиши на @lvivplastoffice""")
+        return
+    data = await state.get_data()
+    date_str = f"{data['stanytsia_day']} {message.text}:00"
+    try:
+        end_time = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        await message.answer("Виникла помилка у форматі дати та часу. Спробуй ще раз.")
+        return
+
+    current_time = datetime.now().replace(second=0, microsecond=0)
+
+    if end_time <= current_time:
+        await message.answer("Ти не можеш зробити бронювання на день та час, які вже минули.")
+        await message.answer("Можеш спробувати ще раз або не робити бронювання", reply_markup=keyboards.book_again)
+        await state.clear()
+        return
+    if message.text==data["stanytsia_start_time"]:
+        await message.answer("Ти не можеш зробити бронювання на нуль хвилин.")
+        await message.answer("Введи час кінця бронювання у форматі ГГ:ХХ \n ⏰Наприклад 15:00")
+        return
     if not re.match(time_pattern, message.text):
         await message.answer("Неправильний формат часу. Будь ласка, введи час у форматі ГГ:ХХ. \n ⏰Наприклад 16:00")
         return
     await state.update_data(stanytsia_end_time=message.text)
     data = await state.get_data()
+    print(data)
 
     room_mapping = get_subcalendars(STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY)
     if data["stanytsia_number_of_room"] in room_mapping:
@@ -144,14 +170,14 @@ async def reg_stanytsia_six(message: Message, state: FSMContext):
         if 'event' in response:
             user_db_obj = user_db.DataBase("db_plast.db").get_user(str(message.from_user.id))
 
-            db = db_booking.BookingDataBase("db_plast.db")
+            # db = db_booking.BookingDataBase("db_plast.db")
             db.add_book_reg(user_id=str(message.from_user.id), user_name=user_db_obj['user_name'],
                             user_surname=user_db_obj['user_surname'], user_domivka="Cтаниця", user_room=room,
                             user_date=data["stanytsia_day"], user_start_time=data["stanytsia_start_time"],
                             user_end_time=data["stanytsia_end_time"],
                             code_of_booking=response['event'].get('id', 'no_code'))
             await message.answer(
-                '🙌🏻 Неймовірно! Твоє бронювання підтверджено. Тепер його можна знайти у <i><a href="https://teamup.com/ksc98b6pqmbapwt883">календарі</a></i>. \n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
+                '🙌🏻 Неймовірно! Твоє бронювання підтверджено. Тепер його можна знайти у <i><a href="https://teamup.com/ksvs3bv65cgver4o6q">календарі</a></i>. \n\n❓Маєш додаткові запитання? Хочеш поділитись відгуком? @lvivplastoffice надасть зворотній зв\'язок 💬',
                 parse_mode=ParseMode.HTML,
             reply_markup=keyboards.mainkb)
             await state.clear()

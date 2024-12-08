@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker
-
+from bots import dbpath, testdbpath
 Base = declarative_base()
 
 
@@ -21,7 +21,7 @@ class BookReg(Base):
 
 class BookingDataBase:
     def __init__(self, db_file):
-        self.engine = create_engine("postgresql://plast_admin:bs&P71q4to;?@localhost:5432/plast_db",
+        self.engine = create_engine(dbpath,
                                     pool_recycle=3600, pool_pre_ping=True)
         Base.metadata.create_all(self.engine)
 

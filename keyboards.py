@@ -64,6 +64,13 @@ stanytsiakb = InlineKeyboardMarkup(
     ]
 )
 
+book_again = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+        InlineKeyboardButton(text="Спробувати ще раз", callback_data="RegistrateBookingStanytsia")
+        ]
+    ]
+)
 stanytsia_rooms_builder = InlineKeyboardBuilder()
 rooms=get_subcalendars(STANYTSIA_TEAMUP_CALENDAR_ID, STANYTSIA_TEAMUP_API_KEY)
 for key in rooms:
